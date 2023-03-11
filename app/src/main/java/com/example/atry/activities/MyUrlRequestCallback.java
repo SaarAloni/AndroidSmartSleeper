@@ -7,6 +7,7 @@ import org.chromium.net.UrlRequest;
 import org.chromium.net.UrlResponseInfo;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 public class MyUrlRequestCallback extends UrlRequest.Callback {
     private static final String TAG = "MyUrlRequestCallback";
@@ -35,6 +36,7 @@ public class MyUrlRequestCallback extends UrlRequest.Callback {
         // You should keep reading the request until there's no more data.
         byteBuffer.clear();
         request.read(byteBuffer);
+        Log.i(TAG, StandardCharsets.UTF_8.decode(byteBuffer).toString());
     }
 
     @Override
