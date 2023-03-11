@@ -30,7 +30,7 @@ public class contactActivity extends AppCompatActivity  {
             @Override
             public void onClick(View view) {
                 UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
-                        "http://192.168.1.10:5000/", new MyUrlRequestCallback(), executor);
+                        "http://192.168.1.206:5000/test", new MyUrlRequestCallback(), executor);
 
                 UrlRequest request = requestBuilder.build();
                 request.start();
