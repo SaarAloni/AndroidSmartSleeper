@@ -1,5 +1,7 @@
 package com.example.atry.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import org.chromium.net.CronetException;
@@ -11,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 public class MyUrlRequestCallback extends UrlRequest.Callback {
     private static final String TAG = "MyUrlRequestCallback";
-
+    private Context context = null;
     @Override
     public void onRedirectReceived(UrlRequest request, UrlResponseInfo info, String newLocationUrl) {
         Log.i(TAG, "onRedirectReceived method called.");
@@ -37,6 +39,7 @@ public class MyUrlRequestCallback extends UrlRequest.Callback {
         byteBuffer.clear();
         request.read(byteBuffer);
         Log.i(TAG, StandardCharsets.UTF_8.decode(byteBuffer).toString());
+
     }
 
     @Override
@@ -49,4 +52,5 @@ public class MyUrlRequestCallback extends UrlRequest.Callback {
         // The request has failed. If possible, handle the error.
         Log.e(TAG, "The request failed.", error);
     }
+
 }
