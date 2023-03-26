@@ -13,6 +13,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,8 +22,12 @@ import android.widget.Toast;
 import com.example.atry.R;
 
 import org.chromium.net.CronetEngine;
+import org.chromium.net.CronetException;
 import org.chromium.net.UrlRequest;
+import org.chromium.net.UrlResponseInfo;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.Executor;
@@ -70,6 +75,54 @@ public class RegisterActivity extends AppCompatActivity {
                 request.start();
             }
         });
+    }
+
+
+    public class MyUrlRequestCallback extends UrlRequest.Callback {
+        private static final String TAG = "MyUrlRequestCallback";
+        private Context context = null;
+        @Override
+        public void onRedirectReceived(UrlRequest request, UrlResponseInfo info, String newLocationUrl) {
+            Log.i(TAG, "onRedirectReceived method called.");
+            // You should call the request.followRedirect() method to continue
+            // processing the request.
+            request.followRedirect();
+        }
+
+        @Override
+        public void onResponseStarted(UrlRequest request, UrlResponseInfo info) {
+            Log.i(TAG, "onResponseStarted method called.");
+            // You should call the request.read() method before the request can be
+            // further processed. The following instruction provides a ByteBuffer object
+            // with a capacity of 102400 bytes for the read() method. The same buffer
+            // with data is passed to the onReadCompleted() method.
+            request.read(ByteBuffer.allocateDirect(102400));
+        }
+
+        @Override
+        public void onReadCompleted(UrlRequest request, UrlResponseInfo info, ByteBuffer byteBuffer) {
+            Log.i(TAG, "onReadCompleted method called.");
+            // You should keep reading the request until there's no more data.
+            byteBuffer.clear();
+            request.read(byteBuffer);
+            if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("ok")){
+                Intent intent = new Intent(RegisterActivity.this, HomePageActivity.class);
+                startActivity(intent);
+            }
+
+        }
+
+        @Override
+        public void onSucceeded(UrlRequest request, UrlResponseInfo info) {
+            Log.i(TAG, "onSucceeded method called.");
+        }
+
+        @Override
+        public void onFailed(UrlRequest request, UrlResponseInfo info, CronetException error) {
+            // The request has failed. If possible, handle the error.
+            Log.e(TAG, "The request failed.", error);
+        }
+
     }
 
 }
