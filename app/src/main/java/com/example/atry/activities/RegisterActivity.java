@@ -106,7 +106,7 @@ public class RegisterActivity extends AppCompatActivity {
             byteBuffer.clear();
             request.read(byteBuffer);
             if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("ok")){
-                Intent intent = new Intent(RegisterActivity.this, HomePageActivity.class);
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                 startActivity(intent);
             }
 
