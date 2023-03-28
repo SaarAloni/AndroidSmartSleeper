@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.widget.RatingBar;
 
 import com.example.atry.R;
 
@@ -14,6 +15,8 @@ public class PlayMusic extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
                 if("start".equals(intent.getAction())) {
+                    Intent rateIntent = new Intent(context, SleepRatingActivity.class);
+                    rateIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     MediaPlayer mPlayer = MediaPlayer.create(context, R.raw.music);
                     mPlayer.start();
                     AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
@@ -28,6 +31,7 @@ public class PlayMusic extends BroadcastReceiver {
                             audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
                             audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
                             audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
+                            context.startActivity(rateIntent);
                         }
                     }, 10000);
                 }

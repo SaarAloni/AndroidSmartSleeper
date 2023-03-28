@@ -1,8 +1,9 @@
 package com.example.atry.activities;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RatingBar;
 
 import com.example.atry.R;
 
@@ -18,47 +20,38 @@ import org.chromium.net.CronetException;
 import org.chromium.net.UrlRequest;
 import org.chromium.net.UrlResponseInfo;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class LoginActivity extends AppCompatActivity {
+public class SleepRatingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_sleep_rating);
+        RatingBar ratingBar = findViewById(R.id.ratingBar);
+        Button rate = findViewById(R.id.rate_button);
+        SharedPreferences sh = getSharedPreferences("MySharedPref", MODE_PRIVATE);
+        String email = sh.getString("email", "");
 
-        Button login = findViewById(R.id.buttonLogin);
-        Button register = findViewById(R.id.buttonRegister);
-        EditText password = findViewById(R.id.editTextPassword);
-        EditText email = findViewById(R.id.editTextEmail);
         CronetEngine.Builder myBuilder = new CronetEngine.Builder(this);
         CronetEngine cronetEngine = myBuilder.build();
         Executor executor = Executors.newSingleThreadExecutor();
-        login.setOnClickListener(new View.OnClickListener() {
+        rate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 MyUrlRequestCallback myUrlRequestCallback = new MyUrlRequestCallback();
                 UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
-                        "http://192.168.1.206:5000/login?" +
-                                "email=" +  email.getText() +
-                                "&password=" + password.getText(),
+                        "http://192.168.1.206:5000/add_rating?" +
+                                "email=" + email +
+                                "&rate=" + ratingBar.getRating() +
+                                "&sleep_id=1", //TODO get sleep_id
                         myUrlRequestCallback, executor);
 
                 UrlRequest request = requestBuilder.build();
                 request.start();
-            }
-        });
-
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(intent);
             }
         });
     }
@@ -91,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
             request.read(byteBuffer);
             //Log.i(TAG, StandardCharsets.UTF_8.decode(byteBuffer).toString());
             if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("ok")){
-                Intent intent = new Intent(LoginActivity.this, HomePageActivity.class);
+                Intent intent = new Intent(SleepRatingActivity.this, HomePageActivity.class);
                 SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE);
                 SharedPreferences.Editor myEdit = sharedPreferences.edit();
                 EditText email = findViewById(R.id.editTextEmail);
@@ -116,5 +109,4 @@ public class LoginActivity extends AppCompatActivity {
         }
 
     }
-
 }
