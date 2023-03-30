@@ -1,9 +1,12 @@
 package com.example.atry.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import androidx.fragment.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,32 +15,39 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.atry.R;
+import com.example.atry.databinding.ActivityHomePageBinding;
+import com.example.atry.databinding.ActivityMainBinding;
 
 import java.util.Calendar;
 import java.util.Date;
 
 public class HomePageActivity extends AppCompatActivity {
+    ActivityHomePageBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_page);
-        TextView welcome = findViewById(R.id.textViewWelcome);
+        binding = ActivityHomePageBinding.inflate(getLayoutInflater());
 
-        SharedPreferences sh = getSharedPreferences("MySharedPref", MODE_PRIVATE);
-        String s1 = sh.getString("email", "");
-        welcome.setText("Welcome " + s1);
-            Date dat = new Date();
-            Calendar cal_alarm = Calendar.getInstance();
-                cal_alarm.setTime(dat);
-                cal_alarm.set(Calendar.HOUR_OF_DAY,15);
-                cal_alarm.set(Calendar.MINUTE,35);
-                cal_alarm.set(Calendar.SECOND,0);
-            setAlarm(this, cal_alarm);
+        setContentView(binding.getRoot());
+        binding.bottomNavigationView.setOnItemSelectedListener(item ->  {
+            Log.d("TAG2", "This is a debug log message.");
+
+            switch (item.getItemId()) {
+                case R.id.settings_nav:
+                    replaceFragment(new SettingsFragment());
+                    break;
+                case R.id.homePage:
+                    replaceFragment(new HomePageFragment());
+                    break;
+            }
+            return true;
+        });
     }
 
     public void setAlarm(Context context, Calendar cal_alarm) {
@@ -47,6 +57,13 @@ public class HomePageActivity extends AppCompatActivity {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, myIntent, 0);
 
         manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
+    }
+
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.homeFrame, fragment);
+        fragmentTransaction.commit();
     }
 
 }
