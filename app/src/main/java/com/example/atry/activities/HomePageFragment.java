@@ -1,13 +1,10 @@
 package com.example.atry.activities;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -26,15 +23,13 @@ import org.chromium.net.UrlResponseInfo;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class HomePageFragment extends Fragment {
 
-
     private TextView welcomeTextView;
+
 
 
     @Override
@@ -137,4 +132,7 @@ public class HomePageFragment extends Fragment {
         }
 
     }
+
+
+
 }

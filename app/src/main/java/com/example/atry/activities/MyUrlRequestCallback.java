@@ -1,7 +1,6 @@
 package com.example.atry.activities;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import org.chromium.net.CronetException;
