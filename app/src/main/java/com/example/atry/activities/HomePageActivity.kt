@@ -4,7 +4,9 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -19,8 +21,16 @@ import com.google.android.gms.fitness.Fitness
 import com.google.android.gms.fitness.FitnessOptions
 import com.google.android.gms.fitness.data.DataSet
 import com.google.android.gms.fitness.data.DataType
+import com.google.android.gms.fitness.data.Field
 import com.google.android.gms.fitness.request.SessionReadRequest
+import org.chromium.net.CronetEngine
+import org.chromium.net.CronetException
+import org.chromium.net.UrlRequest
+import org.chromium.net.UrlResponseInfo
+import java.nio.ByteBuffer
 import java.util.*
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 
@@ -62,7 +72,7 @@ class HomePageActivity : AppCompatActivity() {
             )
 
             val yesterday = Calendar.getInstance();
-            yesterday.add(Calendar.DATE, -2);
+            yesterday.add(Calendar.DATE, -1);
             Log.d(TAG, "onCreate: " + System.currentTimeMillis())
 
             val request = SessionReadRequest.Builder()
@@ -82,18 +92,60 @@ class HomePageActivity : AppCompatActivity() {
                             val sessionStart = session.getStartTime(TimeUnit.MILLISECONDS)
                             val sessionEnd = session.getEndTime(TimeUnit.MILLISECONDS)
                             Log.i(TAG, "Sleep between $sessionStart and $sessionEnd")
+                            val executor: Executor = Executors.newSingleThreadExecutor()
+                            val sh: SharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE)
+                            val s1: String? = sh.getString("email", "")
 
-                            // If the sleep session has finer granularity sub-components, extract them:
-//                            val dataSets = response.getDataSet(session)
-//                            for (dataSet in dataSets) {
-//                                for (point in dataSet.dataPoints) {
-//                                    val sleepStageVal = point.getValue(Field.FIELD_SLEEP_SEGMENT_TYPE).asInt()
-//                                    val sleepStage = SLEEP_STAGE_NAMES[sleepStageVal]
-//                                    val segmentStart = point.getStartTime(TimeUnit.MILLISECONDS)
-//                                    val segmentEnd = point.getEndTime(TimeUnit.MILLISECONDS)
-//                                    Log.i(TAG, "\t* Type $sleepStage between $segmentStart and $segmentEnd")
-//                                }
-//                            }
+                            val myBuilder: CronetEngine.Builder = CronetEngine.Builder(this)
+                            val cronetEngine = myBuilder.build()
+
+                            val requestBuilder = cronetEngine.newUrlRequestBuilder(
+                                    "http://192.168.1.206:5000/add_sleep?" +
+                                            "email=" + s1 +
+                                            "&wake_date=" + sessionEnd +
+                                            "&quality=1" , // TODO add quality
+                                    MyUrlRequestCallback(), executor)
+                            val request = requestBuilder.build()
+                            request.start()
+                            object : CountDownTimer(1000, 1000) {
+                                override fun onTick(millisUntilFinished: Long) {}
+                                override fun onFinish() {
+                                    // If the sleep session has finer granularity sub-components, extract them:
+                                    val dataSets = response.getDataSet(session)
+                                    for (dataSet in dataSets) {
+                                        for (point in dataSet.dataPoints) {
+                                            val sleepStageVal = point.getValue(Field.FIELD_SLEEP_SEGMENT_TYPE).asInt()
+                                            val sleepStage = SLEEP_STAGE_NAMES[sleepStageVal]
+                                            val segmentStart = point.getStartTime(TimeUnit.MILLISECONDS)
+                                            val segmentEnd = point.getEndTime(TimeUnit.MILLISECONDS)
+                                            Log.i(TAG, "\t* Type $sleepStage between $segmentStart and $segmentEnd")
+
+                                            val requestBuilder = cronetEngine.newUrlRequestBuilder(
+                                                    "http://192.168.1.206:5000/add_sleep_stages?" +
+                                                            "start=" + segmentStart +
+                                                            "&end=" + segmentEnd +
+                                                            "&sleep_type=" + sleepStageVal ,
+                                                    MyUrlRequestCallback(), executor)
+                                            val request = requestBuilder.build()
+                                            request.start()
+                                        }
+                                    }
+                                }
+                            }.start()
+
+                            object : CountDownTimer(1000, 1000) {
+                                override fun onTick(millisUntilFinished: Long) {}
+                                override fun onFinish() {
+                                    val requestBuilder1 = cronetEngine.newUrlRequestBuilder(
+                                            "http://192.168.1.206:5000/add_sleep_stages?" +
+                                                    "start=done" +
+                                                    "&end=done"  +
+                                                    "&sleep_type=done"  ,
+                                            MyUrlRequestCallback(), executor)
+                                    val request1 = requestBuilder1.build()
+                                    request1.start()
+                                }
+                            }.start()
                         }
                     }
 
@@ -118,6 +170,8 @@ class HomePageActivity : AppCompatActivity() {
         manager[AlarmManager.RTC_WAKEUP, cal_alarm.timeInMillis] = pendingIntent
     }
 
+
+
     private fun replaceFragment(fragment: Fragment) {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
@@ -136,5 +190,55 @@ class HomePageActivity : AppCompatActivity() {
                 Log.i(TAG, "\tField: " + field.name + " Value: " + dp.getValue(field))
             }
         }
+    }
+}
+
+//    public void setAlarm(Context context, Calendar cal_alarm) {
+//        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//        Intent myIntent = new Intent(context, PlayMusic.class);
+//        myIntent.setAction("start");
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, myIntent, 0);
+//
+//        manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
+//    }
+class MyUrlRequestCallback : UrlRequest.Callback() {
+    private val context: Context? = null
+    override fun onRedirectReceived(request: UrlRequest, info: UrlResponseInfo, newLocationUrl: String) {
+        Log.i(TAG, "onRedirectReceived method called.")
+        // You should call the request.followRedirect() method to continue
+        // processing the request.
+        request.followRedirect()
+    }
+
+    override fun onResponseStarted(request: UrlRequest, info: UrlResponseInfo) {
+        Log.i(TAG, "onResponseStarted method called.")
+        // You should call the request.read() method before the request can be
+        // further processed. The following instruction provides a ByteBuffer object
+        // with a capacity of 102400 bytes for the read() method. The same buffer
+        // with data is passed to the onReadCompleted() method.
+        request.read(ByteBuffer.allocateDirect(102400))
+    }
+
+    override fun onReadCompleted(request: UrlRequest, info: UrlResponseInfo, byteBuffer: ByteBuffer) {
+        Log.i(TAG, "onReadCompleted method called.")
+        // You should keep reading the request until there's no more data.
+        byteBuffer.clear()
+        request.read(byteBuffer)
+//        if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("ok")) {
+//
+//        }
+    }
+
+    override fun onSucceeded(request: UrlRequest, info: UrlResponseInfo) {
+        Log.i(TAG, "onSucceeded method called.")
+    }
+
+    override fun onFailed(request: UrlRequest, info: UrlResponseInfo, error: CronetException) {
+        // The request has failed. If possible, handle the error.
+        Log.e(TAG, "The request failed.", error)
+    }
+
+    companion object {
+        private const val TAG = "MyUrlRequestCallback"
     }
 }
