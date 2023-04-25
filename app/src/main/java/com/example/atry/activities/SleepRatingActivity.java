@@ -83,14 +83,6 @@ public class SleepRatingActivity extends AppCompatActivity {
             //Log.i(TAG, StandardCharsets.UTF_8.decode(byteBuffer).toString());
             if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("ok")){
                 Intent intent = new Intent(SleepRatingActivity.this, HomePageActivity.class);
-                SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE);
-                SharedPreferences.Editor myEdit = sharedPreferences.edit();
-                EditText email = findViewById(R.id.editTextEmail);
-
-                // write all the data entered by the user in SharedPreference and apply
-                myEdit.putString("email", email.getText().toString());
-                myEdit.apply();
-
                 startActivity(intent);
             }
         }

@@ -35,8 +35,7 @@ public class RegisterActivity extends AppCompatActivity {
         EditText gender = findViewById(R.id.editTextGender);
         EditText height = findViewById(R.id.editTextNumberHeight);
         EditText weight = findViewById(R.id.editTextNumberWeight);
-        CronetEngine.Builder myBuilder = new CronetEngine.Builder(this);
-        CronetEngine cronetEngine = myBuilder.build();
+
         final String transform_gender;
         if (gender.getText().equals("female")) {
             transform_gender = "0";
@@ -44,7 +43,8 @@ public class RegisterActivity extends AppCompatActivity {
             transform_gender = "1";
         }
 
-
+        CronetEngine.Builder myBuilder = new CronetEngine.Builder(this);
+        CronetEngine cronetEngine = myBuilder.build();
         Executor executor = Executors.newSingleThreadExecutor();
         register.setOnClickListener(new View.OnClickListener() {
             @Override
