@@ -4,18 +4,12 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.example.atry.R;
-
-import java.util.concurrent.TimeUnit;
 
 public class MyWorker extends Worker {
     public MyWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {

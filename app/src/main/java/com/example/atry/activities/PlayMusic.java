@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
-import android.widget.RatingBar;
 
 import com.example.atry.R;
 
