@@ -28,6 +28,7 @@ import org.chromium.net.CronetException
 import org.chromium.net.UrlRequest
 import org.chromium.net.UrlResponseInfo
 import java.nio.ByteBuffer
+import java.nio.charset.StandardCharsets
 import java.util.*
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -104,7 +105,7 @@ class HomePageActivity : AppCompatActivity() {
                                             "email=" + s1 +
                                             "&wake_date=" + sessionEnd +
                                             "&quality=1" , // TODO add quality
-                                    MyUrlRequestCallback(), executor)
+                                    MyUrlRequestCallback(this), executor)
                             val request = requestBuilder.build()
                             request.start()
                             object : CountDownTimer(1000, 1000) {
@@ -125,7 +126,7 @@ class HomePageActivity : AppCompatActivity() {
                                                             "start=" + segmentStart +
                                                             "&end=" + segmentEnd +
                                                             "&sleep_type=" + sleepStageVal ,
-                                                    MyUrlRequestCallback(), executor)
+                                                    MyUrlRequestCallback(this@HomePageActivity), executor)
                                             val request = requestBuilder.build()
                                             request.start()
                                         }
@@ -141,11 +142,12 @@ class HomePageActivity : AppCompatActivity() {
                                                     "start=done" +
                                                     "&end=done"  +
                                                     "&sleep_type=done"  ,
-                                            MyUrlRequestCallback(), executor)
+                                            MyUrlRequestCallback(this@HomePageActivity), executor)
                                     val request1 = requestBuilder1.build()
                                     request1.start()
                                 }
                             }.start()
+
                         }
                     }
 
@@ -191,6 +193,51 @@ class HomePageActivity : AppCompatActivity() {
             }
         }
     }
+
+
+    class MyUrlRequestCallback(homePageActivity: HomePageActivity) : UrlRequest.Callback() {
+        private var homePageActivity: HomePageActivity? = homePageActivity;
+
+        override fun onRedirectReceived(request: UrlRequest, info: UrlResponseInfo, newLocationUrl: String) {
+            Log.i(TAG, "onRedirectReceived method called.")
+            // You should call the request.followRedirect() method to continue
+            // processing the request.
+            request.followRedirect()
+        }
+
+        override fun onResponseStarted(request: UrlRequest, info: UrlResponseInfo) {
+            Log.i(TAG, "onResponseStarted method called.")
+            // You should call the request.read() method before the request can be
+            // further processed. The following instruction provides a ByteBuffer object
+            // with a capacity of 102400 bytes for the read() method. The same buffer
+            // with data is passed to the onReadCompleted() method.
+            request.read(ByteBuffer.allocateDirect(102400))
+        }
+
+        override fun onReadCompleted(request: UrlRequest, info: UrlResponseInfo, byteBuffer: ByteBuffer) {
+            Log.i(TAG, "onReadCompleted method called.")
+            // You should keep reading the request until there's no more data.
+            byteBuffer.clear()
+            request.read(byteBuffer)
+            if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("need rating")) {
+                val intent = Intent(homePageActivity, SleepRatingActivity::class.java)
+                homePageActivity?.startActivity(intent);
+            }
+        }
+
+        override fun onSucceeded(request: UrlRequest, info: UrlResponseInfo) {
+            Log.i(TAG, "onSucceeded method called.")
+        }
+
+        override fun onFailed(request: UrlRequest, info: UrlResponseInfo, error: CronetException) {
+            // The request has failed. If possible, handle the error.
+            Log.e(TAG, "The request failed.", error)
+        }
+
+        companion object {
+            private const val TAG = "MyUrlRequestCallback"
+        }
+    }
 }
 
 //    public void setAlarm(Context context, Calendar cal_alarm) {
@@ -201,44 +248,3 @@ class HomePageActivity : AppCompatActivity() {
 //
 //        manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
 //    }
-class MyUrlRequestCallback : UrlRequest.Callback() {
-    private val context: Context? = null
-    override fun onRedirectReceived(request: UrlRequest, info: UrlResponseInfo, newLocationUrl: String) {
-        Log.i(TAG, "onRedirectReceived method called.")
-        // You should call the request.followRedirect() method to continue
-        // processing the request.
-        request.followRedirect()
-    }
-
-    override fun onResponseStarted(request: UrlRequest, info: UrlResponseInfo) {
-        Log.i(TAG, "onResponseStarted method called.")
-        // You should call the request.read() method before the request can be
-        // further processed. The following instruction provides a ByteBuffer object
-        // with a capacity of 102400 bytes for the read() method. The same buffer
-        // with data is passed to the onReadCompleted() method.
-        request.read(ByteBuffer.allocateDirect(102400))
-    }
-
-    override fun onReadCompleted(request: UrlRequest, info: UrlResponseInfo, byteBuffer: ByteBuffer) {
-        Log.i(TAG, "onReadCompleted method called.")
-        // You should keep reading the request until there's no more data.
-        byteBuffer.clear()
-        request.read(byteBuffer)
-//        if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("ok")) {
-//
-//        }
-    }
-
-    override fun onSucceeded(request: UrlRequest, info: UrlResponseInfo) {
-        Log.i(TAG, "onSucceeded method called.")
-    }
-
-    override fun onFailed(request: UrlRequest, info: UrlResponseInfo, error: CronetException) {
-        // The request has failed. If possible, handle the error.
-        Log.e(TAG, "The request failed.", error)
-    }
-
-    companion object {
-        private const val TAG = "MyUrlRequestCallback"
-    }
-}
