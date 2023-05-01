@@ -29,6 +29,7 @@ import java.util.concurrent.Executors;
 public class HomePageFragment extends Fragment {
 
     private TextView welcomeTextView;
+    private TextView alarmText;
 
 
 
@@ -39,10 +40,12 @@ public class HomePageFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
         welcomeTextView = view.findViewById(R.id.textViewWelcome);
+        alarmText = view.findViewById(R.id.alarmText);
 
         SharedPreferences sh = getActivity().getSharedPreferences("MySharedPref", Context.MODE_PRIVATE);
         String s1 = sh.getString("email", "");
         welcomeTextView.setText("Welcome " + s1);
+
 
         Executor executor = Executors.newSingleThreadExecutor();
         Button setAlarm = view.findViewById(R.id.setAlarmButton);
@@ -50,6 +53,14 @@ public class HomePageFragment extends Fragment {
         CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
         CronetEngine cronetEngine = myBuilder.build();
         TextView time = view.findViewById(R.id.editTextTime);
+
+        UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
+                "http://192.168.1.206:5000/get_alarm?" +
+                        "email=" +  s1,
+                new MyUrlRequestCallback(), executor);
+
+        UrlRequest request = requestBuilder.build();
+        request.start();
 
         setAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,10 +124,19 @@ public class HomePageFragment extends Fragment {
             // You should keep reading the request until there's no more data.
             byteBuffer.clear();
             request.read(byteBuffer);
-            if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("ok")){
-                Intent intent = new Intent(getContext(), LoginActivity.class);
+            String res = StandardCharsets.UTF_8.decode(byteBuffer).toString();
+            Log.d("tag", res);
+            if (res.contains(":")){
+
+                alarmText.setText("Your timer was set to be at " +
+                        res.split("[�]", 0)[0]);
+            }
+            if (res.contains("ok")){
+                Intent intent = new Intent(getContext(), HomePageActivity.class);
                 startActivity(intent);
             }
+
+
 
         }
 
