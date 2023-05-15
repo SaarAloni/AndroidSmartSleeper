@@ -1,8 +1,14 @@
 package com.example.atry.activities;
 
+import static android.app.PendingIntent.FLAG_MUTABLE;
+import static android.content.Context.ALARM_SERVICE;
+
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.atry.R;
 
@@ -23,6 +30,8 @@ import org.chromium.net.UrlResponseInfo;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -38,6 +47,8 @@ public class HomePageFragment extends Fragment {
         // Inflate the layout for this fragment
         Log.d("TAG", "This is a debug log message.");
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
+
+
 
         welcomeTextView = view.findViewById(R.id.textViewWelcome);
         alarmText = view.findViewById(R.id.alarmText);
@@ -77,25 +88,51 @@ public class HomePageFragment extends Fragment {
             }
         });
 
-//        Date dat = new Date();
-//        Calendar cal_alarm = Calendar.getInstance();
-//        cal_alarm.setTime(dat);
-//        cal_alarm.set(Calendar.HOUR_OF_DAY, 15);
-//        cal_alarm.set(Calendar.MINUTE, 35);
-//        cal_alarm.set(Calendar.SECOND, 0);
-//        setAlarm(getActivity(), cal_alarm);
+        Date dat = new Date();
+        Calendar cal_alarm = Calendar.getInstance();
+        cal_alarm.setTime(dat);
+        cal_alarm.set(Calendar.HOUR_OF_DAY, 10);
+        cal_alarm.set(Calendar.MINUTE, 5);
+        cal_alarm.set(Calendar.SECOND, 0);
+        setAlarm(getActivity(), cal_alarm);
+
+
 
         return view;
     }
 
-//    public void setAlarm(Context context, Calendar cal_alarm) {
-//        AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-//        Intent myIntent = new Intent(context, PlayMusic.class);
-//        myIntent.setAction("start");
-//        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, myIntent, 0);
+    public void setAlarm(Context context, Calendar cal_alarm) {
+        Intent intent = new Intent(getContext(), PlayMusic.class);
+        intent.setAction("start");
+        intent.putExtra("time", "10000"); // ToDo get time of wake
+        PendingIntent pendingIntent = null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            pendingIntent = PendingIntent.getBroadcast(
+                    getContext().getApplicationContext(), 234324243, intent, FLAG_MUTABLE);
+        } else {
+            pendingIntent = PendingIntent.getBroadcast(
+                    getContext().getApplicationContext(), 234324243, intent, PendingIntent.FLAG_ONE_SHOT);
+        }
+        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
+                + (3 * 1000), pendingIntent);
+
+//        Intent myIntent = new Intent(getContext(), PlayMusic.class);
+//        myIntent.setAction("stop");
+//        PendingIntent pendingIntent2 = null;
 //
-//        manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
-//    }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//            pendingIntent2 = PendingIntent.getBroadcast(
+//                    getContext().getApplicationContext(), 234324243, myIntent, FLAG_MUTABLE);
+//        } else {
+//            pendingIntent2 = PendingIntent.getBroadcast(
+//                    getContext().getApplicationContext(), 234324243, myIntent, PendingIntent.FLAG_ONE_SHOT);
+//        }
+//        AlarmManager alarmManager2 = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
+//        alarmManager2.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
+//                + (30 * 1000), pendingIntent2);
+    }
 
     public class MyUrlRequestCallback extends UrlRequest.Callback {
         private static final String TAG = "MyUrlRequestCallback";
@@ -152,7 +189,5 @@ public class HomePageFragment extends Fragment {
         }
 
     }
-
-
 
 }

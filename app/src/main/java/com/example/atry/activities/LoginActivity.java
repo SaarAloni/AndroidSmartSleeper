@@ -1,9 +1,14 @@
 package com.example.atry.activities;
 
+import static android.app.PendingIntent.FLAG_MUTABLE;
+
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -60,9 +65,24 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
-
-//        updateUI(account);
+//        Intent intent = getIntent();
+//        String value = intent.getStringExtra("key");
+//        if("start".equals(value)) {
+//            Intent myIntent = new Intent(this, RiseVolume.class);
+//            myIntent.setAction("start");
+//            PendingIntent pendingIntent = null;
+//
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                pendingIntent = PendingIntent.getBroadcast(
+//                        this.getApplicationContext(), 234324243, myIntent, FLAG_MUTABLE);
+//            } else {
+//                pendingIntent = PendingIntent.getBroadcast(
+//                        this.getApplicationContext(), 234324243, myIntent, PendingIntent.FLAG_ONE_SHOT);
+//            }
+//            AlarmManager alarmManager = (AlarmManager) this.getSystemService(ALARM_SERVICE);
+//            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
+//                    + (3 * 1000), pendingIntent);
+//        }
 
 
         findViewById(R.id.sign_in_button).setOnClickListener(new View.OnClickListener() {
