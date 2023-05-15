@@ -5,10 +5,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.atry.R
@@ -75,6 +77,14 @@ class HomePageActivity : AppCompatActivity() {
             val yesterday = Calendar.getInstance();
             yesterday.add(Calendar.DATE, -1);
             Log.d(TAG, "onCreate: " + System.currentTimeMillis())
+
+            var dat:Date = Date();
+            var cal_alarm:Calendar = Calendar.getInstance();
+            cal_alarm.setTime(dat);
+            cal_alarm.set(Calendar.HOUR_OF_DAY, 22);
+            cal_alarm.set(Calendar.MINUTE, 50);
+            cal_alarm.set(Calendar.SECOND, 0);
+            setAlarm(this, cal_alarm);
 
             val request = SessionReadRequest.Builder()
                     .readSessionsFromAllApps()
@@ -165,10 +175,21 @@ class HomePageActivity : AppCompatActivity() {
     }
 
     fun setAlarm(context: Context?, cal_alarm: Calendar) {
+        Intent().also { intent->
+            intent.setAction("com.example.arty.activities.PlayMusic")
+            sendBroadcast(intent)
+        }
         val manager = getSystemService(ALARM_SERVICE) as AlarmManager
-        val myIntent = Intent(context, PlayMusic::class.java)
+        val myIntent = Intent(this, PlayMusic::class.java)
         myIntent.action = "start"
-        val pendingIntent = PendingIntent.getBroadcast(context, 0, myIntent, 0)
+        var pendingIntent: PendingIntent?;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            pendingIntent =
+                PendingIntent.getActivity(this, 0, myIntent, PendingIntent.FLAG_MUTABLE)
+        } else {
+            pendingIntent =
+                PendingIntent.getActivity(this, 0, myIntent, PendingIntent.FLAG_ONE_SHOT)
+        }
         manager[AlarmManager.RTC_WAKEUP, cal_alarm.timeInMillis] = pendingIntent
     }
 
@@ -238,6 +259,7 @@ class HomePageActivity : AppCompatActivity() {
             private const val TAG = "MyUrlRequestCallback"
         }
     }
+
 }
 
 //    public void setAlarm(Context context, Calendar cal_alarm) {
@@ -248,3 +270,6 @@ class HomePageActivity : AppCompatActivity() {
 //
 //        manager.set(AlarmManager.RTC_WAKEUP,cal_alarm.getTimeInMillis(), pendingIntent);
 //    }
+
+
+
