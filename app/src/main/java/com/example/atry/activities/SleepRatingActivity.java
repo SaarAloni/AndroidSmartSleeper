@@ -42,7 +42,7 @@ public class SleepRatingActivity extends AppCompatActivity {
             public void onClick(View view) {
                 MyUrlRequestCallback myUrlRequestCallback = new MyUrlRequestCallback();
                 UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
-                        "http://192.168.1.206:5000/add_rating?" +
+                        "http://"+getString(R.string.ip)+":5000/add_rating?" +
                                 "email=" + email +
                                 "&rate=" + ratingBar.getRating(),
                         myUrlRequestCallback, executor);

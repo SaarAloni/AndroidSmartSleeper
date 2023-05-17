@@ -66,7 +66,7 @@ public class HomePageFragment extends Fragment {
         TextView time = view.findViewById(R.id.editTextTime);
 
         UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
-                "http://192.168.1.206:5000/get_alarm?" +
+                "http://"+getString(R.string.ip)+":5000/get_alarm?" +
                         "email=" +  s1,
                 new MyUrlRequestCallback(), executor);
 
@@ -77,7 +77,7 @@ public class HomePageFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
-                        "http://192.168.1.206:5000/set_alarm?" +
+                        "http://"+getString(R.string.ip)+"/set_alarm?" +
                                 "email=" +  s1 +
                                 "&wake_time=" + time.getText().toString(),
                         new MyUrlRequestCallback(), executor);
@@ -88,13 +88,13 @@ public class HomePageFragment extends Fragment {
             }
         });
 
-        Date dat = new Date();
-        Calendar cal_alarm = Calendar.getInstance();
-        cal_alarm.setTime(dat);
-        cal_alarm.set(Calendar.HOUR_OF_DAY, 10);
-        cal_alarm.set(Calendar.MINUTE, 5);
-        cal_alarm.set(Calendar.SECOND, 0);
-        setAlarm(getActivity(), cal_alarm);
+//        Date dat = new Date();
+//        Calendar cal_alarm = Calendar.getInstance();
+//        cal_alarm.setTime(dat);
+//        cal_alarm.set(Calendar.HOUR_OF_DAY, 10);
+//        cal_alarm.set(Calendar.MINUTE, 5);
+//        cal_alarm.set(Calendar.SECOND, 0);
+//        setAlarm(getActivity(), cal_alarm);
 
 
 
@@ -129,7 +129,7 @@ public class HomePageFragment extends Fragment {
 //            pendingIntent2 = PendingIntent.getBroadcast(
 //                    getContext().getApplicationContext(), 234324243, myIntent, PendingIntent.FLAG_ONE_SHOT);
 //        }
-//        AlarmManager alarmManager2 = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
+//        AlarmManager alarmManager2 = (AlarmManager)tmp.split("[.]")[0] + tom getContext().getSystemService(ALARM_SERVICE);
 //        alarmManager2.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
 //                + (30 * 1000), pendingIntent2);
     }
@@ -163,15 +163,36 @@ public class HomePageFragment extends Fragment {
             request.read(byteBuffer);
             String res = StandardCharsets.UTF_8.decode(byteBuffer).toString();
             Log.d("tag", res);
+            String tmp = res.split("[,]", 0)[0];
+            Log.d(TAG, "onReadCompleted: " + tmp);
             if (res.contains(":")){
 
                 alarmText.setText("Your timer was set to be at " +
-                        res.split("[�]", 0)[0]);
+                        tmp.split("[.]")[0]);
+                int time_too_wake = Integer.parseInt(tmp.split("[.]")[1]);
+                Log.d(TAG, "onReadCompleted: " + time_too_wake);
+                int hour =  Integer.parseInt(tmp.split("[.]")[0].split("[:]")[0]);
+                int minute =  Integer.parseInt(tmp.split("[.]")[0].split("[:]")[1]);
+                int seconds =  Integer.parseInt(tmp.split("[.]")[0].split("[:]")[2]);
+                Date dat = new Date();
+                Calendar cal_alarm = Calendar.getInstance();
+                cal_alarm.setTime(dat);
+                if (hour > cal_alarm.get(Calendar.HOUR_OF_DAY)
+                        && minute > cal_alarm.get(Calendar.MINUTE)
+                        && seconds > cal_alarm.get(Calendar.SECOND)) {
+                    cal_alarm.add(Calendar.HOUR_OF_DAY, 24);
+                }
+                cal_alarm.add(Calendar.SECOND, -time_too_wake);
+                cal_alarm.set(Calendar.HOUR_OF_DAY, hour);
+                cal_alarm.set(Calendar.MINUTE, minute);
+                cal_alarm.set(Calendar.SECOND, seconds);
+                setAlarm(getActivity(), cal_alarm);
             }
             if (res.contains("ok")){
                 Intent intent = new Intent(getContext(), HomePageActivity.class);
                 startActivity(intent);
             }
+            
 
 
 

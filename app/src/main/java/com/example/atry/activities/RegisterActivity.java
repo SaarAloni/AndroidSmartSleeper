@@ -50,7 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
-                        "http://192.168.1.206:5000/register?" +
+                        "http://"+getString(R.string.ip)+":5000/register?" +
                                 "email=" +  email.getText() +
                                 "&birthday=" + birthday.getText() +
                                 "&gender=" + transform_gender +

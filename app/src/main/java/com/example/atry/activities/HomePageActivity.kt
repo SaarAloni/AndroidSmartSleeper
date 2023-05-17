@@ -111,7 +111,7 @@ class HomePageActivity : AppCompatActivity() {
                             val cronetEngine = myBuilder.build()
 
                             val requestBuilder = cronetEngine.newUrlRequestBuilder(
-                                    "http://192.168.1.206:5000/add_sleep?" +
+                                    "http://" + getString(R.string.ip) + ":5000/add_sleep?" +
                                             "email=" + s1 +
                                             "&wake_date=" + sessionEnd +
                                             "&quality=1" , // TODO add quality
@@ -132,7 +132,7 @@ class HomePageActivity : AppCompatActivity() {
                                             Log.i(TAG, "\t* Type $sleepStage between $segmentStart and $segmentEnd")
 
                                             val requestBuilder = cronetEngine.newUrlRequestBuilder(
-                                                    "http://192.168.1.206:5000/add_sleep_stages?" +
+                                                    "http://"+getString(R.string.ip)+":5000/add_sleep_stages?" +
                                                             "start=" + segmentStart +
                                                             "&end=" + segmentEnd +
                                                             "&sleep_type=" + sleepStageVal ,
@@ -148,7 +148,7 @@ class HomePageActivity : AppCompatActivity() {
                                 override fun onTick(millisUntilFinished: Long) {}
                                 override fun onFinish() {
                                     val requestBuilder1 = cronetEngine.newUrlRequestBuilder(
-                                            "http://192.168.1.206:5000/add_sleep_stages?" +
+                                            "http://"+getString(R.string.ip)+":5000/add_sleep_stages?" +
                                                     "start=done" +
                                                     "&end=done"  +
                                                     "&sleep_type=done"  ,
