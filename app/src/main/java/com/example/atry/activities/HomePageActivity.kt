@@ -44,6 +44,10 @@ class HomePageActivity : AppCompatActivity() {
     private var gsc: GoogleSignInClient? = null
     private var gso: GoogleSignInOptions? = null
 
+
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomePageBinding.inflate(layoutInflater)
@@ -56,6 +60,8 @@ class HomePageActivity : AppCompatActivity() {
                 .addDataType(DataType.TYPE_SLEEP_SEGMENT, FitnessOptions.ACCESS_READ)
                 .build()
         val account = GoogleSignIn.getAccountForExtension(this, fitnessOptions)
+
+
         Log.d(TAG, "onCreate: " + account.email)
         if (!GoogleSignIn.hasPermissions(account, fitnessOptions)) {
             GoogleSignIn.requestPermissions(
