@@ -87,6 +87,8 @@
         </activity>
 
         <receiver android:name=".activities.PlayMusic" />
+        <receiver android:name=".activities.StopAlarm"
+            tools:ignore="Instantiatable" />
 
 
         <!--        <meta-data-->
