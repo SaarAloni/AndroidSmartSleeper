@@ -50,7 +50,6 @@ public class LoginActivity extends AppCompatActivity {
 
         Button register = findViewById(R.id.buttonRegister);
         CronetEngine.Builder myBuilder = new CronetEngine.Builder(this);
-
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
@@ -135,7 +134,7 @@ public class LoginActivity extends AppCompatActivity {
             CronetEngine cronetEngine = myBuilder.build();
             Executor executor = Executors.newSingleThreadExecutor();
             UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
-                    "http://192.168.1.206:5000/login?" +
+                    "http://"+ getString(R.string.ip) +":5000/login?" +
                             "email=" +  account.getEmail(),
                     new MyUrlRequestCallback(), executor);
 

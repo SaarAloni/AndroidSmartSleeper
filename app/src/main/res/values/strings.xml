@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TRY</string>
+    <string name="app_name">Smart Sleep</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -17,4 +17,5 @@
 
     <string name="msg_conn_not_available">msg_conn_not_available</string>
     <string name="ok">ok</string>
+    <string name="ip">192.168.1.206</string>
 </resources>
