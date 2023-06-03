@@ -79,6 +79,8 @@ public class HomePageFragment extends Fragment {
 
     private StopAlarm startLight;
 
+    private String time_to_wake ;
+
 
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -99,7 +101,6 @@ public class HomePageFragment extends Fragment {
             Manifest.permission.BLUETOOTH_PRIVILEGED
     };
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -118,6 +119,7 @@ public class HomePageFragment extends Fragment {
         Executor executor = Executors.newSingleThreadExecutor();
         Button setAlarm = view.findViewById(R.id.setAlarmButton);
         Button stopAlarm = view.findViewById(R.id.stopAlarmButton);
+        Button testAlarm = view.findViewById(R.id.testButton);
 
         CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
         CronetEngine cronetEngine = myBuilder.build();
@@ -138,11 +140,25 @@ public class HomePageFragment extends Fragment {
             }
         });
 
+        testAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                Date dat = new Date();
+                Calendar cal_alarm = Calendar.getInstance();
+                cal_alarm.setTime(dat);
+                cal_alarm.add(Calendar.SECOND, 3);
+                setAlarm(getActivity(), cal_alarm);
+            }
+        });
+
         setAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Executor executor = Executors.newSingleThreadExecutor();
+                CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
+                CronetEngine cronetEngine = myBuilder.build();
                 UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
-                        "http://" + getString(R.string.ip) + "/set_alarm?" +
+                        "http://" + getString(R.string.ip) + ":5000/set_alarm?" +
                                 "email=" + s1 +
                                 "&wake_time=" + time.getText().toString(),
                         new MyUrlRequestCallback(), executor);
@@ -510,7 +526,7 @@ public class HomePageFragment extends Fragment {
     public void setAlarm(Context context, Calendar cal_alarm) {
         Intent intent = new Intent(getContext(), PlayMusic.class);
         intent.setAction("start");
-        intent.putExtra("time", "10000"); // ToDo get time of wake
+        intent.putExtra("time", time_to_wake);
         PendingIntent pendingIntent = null;
         boolean bool = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -526,8 +542,9 @@ public class HomePageFragment extends Fragment {
         }
         if (bool) {
             AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
-                    + (3 * 1000), pendingIntent);
+//            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
+//                    + (3 * 1000), pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, cal_alarm.getTimeInMillis(), pendingIntent);
         }
 
 
@@ -547,25 +564,25 @@ public class HomePageFragment extends Fragment {
 //                + (30 * 1000), pendingIntent2);
     }
 
-    public void setLight(Context context) {
-        Intent intent = new Intent(getContext(), StopAlarm.class);
-        Log.d("TAG", "setLight: here " );
-        intent.setAction("start");
-        intent.putExtra("time", "10000"); // ToDo get time of wake
-        PendingIntent pendingIntent = null;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            pendingIntent = PendingIntent.getBroadcast(
-                    getContext().getApplicationContext(), 234324243, intent, FLAG_MUTABLE);
-        } else {
-            pendingIntent = PendingIntent.getBroadcast(
-                    getContext().getApplicationContext(), 234324243, intent, PendingIntent.FLAG_ONE_SHOT);
-        }
-        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
-                + (2 * 1000), pendingIntent);
-
-    }
+//    public void setLight(Context context) {
+//        Intent intent = new Intent(getContext(), StopAlarm.class);
+//        Log.d("TAG", "setLight: here " );
+//        intent.setAction("start");
+//        intent.putExtra("time", "10000"); // ToDo get time of wake
+//        PendingIntent pendingIntent = null;
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//            pendingIntent = PendingIntent.getBroadcast(
+//                    getContext().getApplicationContext(), 234324243, intent, FLAG_MUTABLE);
+//        } else {
+//            pendingIntent = PendingIntent.getBroadcast(
+//                    getContext().getApplicationContext(), 234324243, intent, PendingIntent.FLAG_ONE_SHOT);
+//        }
+//        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
+//        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
+//                + (2 * 1000), pendingIntent);
+//
+//    }
 
     public class MyUrlRequestCallback extends UrlRequest.Callback {
         private static final String TAG = "MyUrlRequestCallback";
@@ -604,6 +621,7 @@ public class HomePageFragment extends Fragment {
                 alarmText.setText("Your timer was set to be at " +
                         tmp.split("[.]")[0]);
                 int time_too_wake = Integer.parseInt(tmp.split("[.]")[1]);
+                time_to_wake = String.valueOf(time_too_wake*1000);
                 Log.d(TAG, "onReadCompleted: " + time_too_wake);
                 int hour = Integer.parseInt(tmp.split("[.]")[0].split("[:]")[0]);
                 int minute = Integer.parseInt(tmp.split("[.]")[0].split("[:]")[1]);
@@ -611,9 +629,17 @@ public class HomePageFragment extends Fragment {
                 Date dat = new Date();
                 cal_alarm = Calendar.getInstance();
                 cal_alarm.setTime(dat);
-                if (hour > cal_alarm.get(Calendar.HOUR_OF_DAY)
-                        && minute > cal_alarm.get(Calendar.MINUTE)
-                        && seconds > cal_alarm.get(Calendar.SECOND)) {
+                if (hour < cal_alarm.get(Calendar.HOUR_OF_DAY)) {
+                    cal_alarm.add(Calendar.HOUR_OF_DAY, 24);
+                }
+                if (hour == cal_alarm.get(Calendar.HOUR_OF_DAY)
+                        && minute < cal_alarm.get(Calendar.MINUTE)) {
+                    cal_alarm.add(Calendar.HOUR_OF_DAY, 24);
+                }
+
+                if (hour == cal_alarm.get(Calendar.HOUR_OF_DAY)
+                        && minute == cal_alarm.get(Calendar.MINUTE)
+                        && seconds < cal_alarm.get(Calendar.SECOND)) {
                     cal_alarm.add(Calendar.HOUR_OF_DAY, 24);
                 }
                 cal_alarm.add(Calendar.SECOND, -time_too_wake);
@@ -626,7 +652,7 @@ public class HomePageFragment extends Fragment {
 
             }
             if (res.contains("ok")) {
-                Intent intent = new Intent(getContext(), HomePageActivity.class);
+                Intent intent = new Intent(getContext(), HomePageFragment.class);
                 startActivity(intent);
             }
         }
