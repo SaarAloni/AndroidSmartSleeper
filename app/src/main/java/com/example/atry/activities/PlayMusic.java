@@ -80,7 +80,7 @@ public class PlayMusic extends BroadcastReceiver {
                             if (j == 9) {
                                 Thread.sleep(2000);
                             }
-                            Thread.sleep(v / 9);
+                            Thread.sleep(v / 8);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -88,41 +88,41 @@ public class PlayMusic extends BroadcastReceiver {
                         mHandler.post(new Runnable() {
                             @Override
                             public void run() {
-                                        if (j == 9) {
-                                            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                                                // TODO: Consider calling
-                                                //    ActivityCompat#requestPermissions
-                                                // here to request the missing permissions, and then overriding
-                                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                                //                                          int[] grantResults)
-                                                // to handle the case where the user grants the permission. See the documentation
-                                                // for ActivityCompat#requestPermissions for more details.
-                                                return;
-                                            }
-//                                            mGatt.disconnect();
-                                        }
-                                        if (j == 8) {
-                                            //Toast.makeText(context, "stopped", Toast.LENGTH_SHORT).show();
-                                            for (BluetoothGattService service : services) {
-                                                BluetoothGattCharacteristic characteristic = service.getCharacteristics().get(0);
-                                                byte x = 0;
-                                                characteristic.setValue(String.valueOf(x));
-                                                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                                                    // TODO: Consider calling
-                                                    //    ActivityCompat#requestPermissions
-                                                    // here to request the missing permissions, and then overriding
-                                                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                                    //                                          int[] grantResults)
-                                                    // to handle the case where the user grants the permission. See the documentation
-                                                    // for ActivityCompat#requestPermissions for more details.
-                                                    return;
-                                                }
-                                                boolean success = mGatt.writeCharacteristic(characteristic);
-
-                                            }
-//                                            mPlayer.stop();
-//                                            blueconnection.getPlayer().stop();
-                                        }
+//                                        if (j == 9) {
+//                                            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+//                                                // TODO: Consider calling
+//                                                //    ActivityCompat#requestPermissions
+//                                                // here to request the missing permissions, and then overriding
+//                                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                                                //                                          int[] grantResults)
+//                                                // to handle the case where the user grants the permission. See the documentation
+//                                                // for ActivityCompat#requestPermissions for more details.
+//                                                return;
+//                                            }
+////                                            mGatt.disconnect();
+//                                        }
+//                                        if (j == 8) {
+//                                            //Toast.makeText(context, "stopped", Toast.LENGTH_SHORT).show();
+//                                            for (BluetoothGattService service : services) {
+//                                                BluetoothGattCharacteristic characteristic = service.getCharacteristics().get(0);
+//                                                byte x = 0;
+//                                                characteristic.setValue(String.valueOf(x));
+//                                                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+//                                                    // TODO: Consider calling
+//                                                    //    ActivityCompat#requestPermissions
+//                                                    // here to request the missing permissions, and then overriding
+//                                                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                                                    //                                          int[] grantResults)
+//                                                    // to handle the case where the user grants the permission. See the documentation
+//                                                    // for ActivityCompat#requestPermissions for more details.
+//                                                    return;
+//                                                }
+//                                                boolean success = mGatt.writeCharacteristic(characteristic);
+//
+//                                            }
+////                                            mPlayer.stop();
+////                                            blueconnection.getPlayer().stop();
+//                                        }
                                         //Toast.makeText(context, String.valueOf(currentProgressCount), Toast.LENGTH_SHORT).show();
                                         audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
                                         for (BluetoothGattService service : services) {

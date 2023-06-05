@@ -123,7 +123,10 @@ public class HomePageFragment extends Fragment {
 
         CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
         CronetEngine cronetEngine = myBuilder.build();
-        TextView time = view.findViewById(R.id.editTextTime);
+        TextView day = view.findViewById(R.id.day);
+        TextView action = view.findViewById(R.id.action);
+        TextView hour = view.findViewById(R.id.hour);
+        TextView date = view.findViewById(R.id.date);
 
         UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
                 "http://" + getString(R.string.ip) + ":5000/get_alarm?" +
@@ -160,7 +163,10 @@ public class HomePageFragment extends Fragment {
                 UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
                         "http://" + getString(R.string.ip) + ":5000/set_alarm?" +
                                 "email=" + s1 +
-                                "&wake_time=" + time.getText().toString(),
+                                "&day=" + day.getText().toString() +
+                                "&action=" + action.getText().toString() +
+                                "&hour=" + hour.getText().toString() +
+                                "&date=" + date.getText().toString(),
                         new MyUrlRequestCallback(), executor);
 
                 UrlRequest request = requestBuilder.build();
@@ -651,8 +657,11 @@ public class HomePageFragment extends Fragment {
                 }
 
             }
+            if (res.contains("not")) {
+                alarmText.setText("The alarm was set off ");
+            }
             if (res.contains("ok")) {
-                Intent intent = new Intent(getContext(), HomePageFragment.class);
+                Intent intent = new Intent(getContext(), HomePageActivity.class);
                 startActivity(intent);
             }
         }
@@ -672,145 +681,4 @@ public class HomePageFragment extends Fragment {
 
 
 
-//    private final BroadcastReceiver receiver = new BroadcastReceiver() {
-//        public void onReceive(Context context, Intent intent) {
-//            Log.d("TAG", "onReceive: ");
-//            String action = intent.getAction();
-//            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-//                // Discovery has found a device. Get the BluetoothDevice
-//                // object and its info from the Intent.
-//                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-//                int permission1 = ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//                int permission2 = ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN);
-//                if (permission1 != PackageManager.PERMISSION_GRANTED) {
-//                    // We don't have permission so prompt the user
-//                    ActivityCompat.requestPermissions(
-//                            getActivity(),
-//                            PERMISSIONS_STORAGE,
-//                            1
-//                    );
-//                } else if (permission2 != PackageManager.PERMISSION_GRANTED){
-//                    ActivityCompat.requestPermissions(
-//                            getActivity(),
-//                            PERMISSIONS_LOCATION,
-//                            1
-//                    );
-//                }
-//                String deviceName = device.getName();
-//                String deviceHardwareAddress = device.getAddress(); // MAC address
-//                Log.d("TAG", "onReceive: " + deviceName);
-//                Log.d("TAG", "onReceive: " + deviceHardwareAddress);
-//                Log.d("TAG", "onReceive: " + device.getUuids());
-////
-//                if(deviceName != null && deviceName.equals("MLT-BT05")) {
-////                    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-////                    CreateConnectThread createConnectThread = new CreateConnectThread(bluetoothAdapter,
-////                            deviceHardwareAddress, getContext(), getActivity());
-////                    createConnectThread.start();
-////                    getContext().unregisterReceiver(this);
-//
-//                    Log.d("TAG", "onReceive: here start");
-//                    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-//                    createConnectThread = new CreateConnectThread(bluetoothAdapter, deviceHardwareAddress, getContext(), getActivity());
-//                    createConnectThread.start();
-//                }
-//            }
-//        }
-//    };
-
-//    public static class CreateConnectThread extends Thread {
-//
-//        public CreateConnectThread(BluetoothAdapter bluetoothAdapter, String address, Context context, Activity activity) {
-//            /*
-//            Use a temporary object that is later assigned to mmSocket
-//            because mmSocket is final.
-//             */
-//            BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
-//
-//            BluetoothSocket tmp = null;
-//
-//            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-//                Log.d("TAG", "CreateConnectThread: no blue");
-////                return;
-//            }
-//            Log.d("Blue", " succ");
-//            int permission1 = ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//            int permission2 = ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN);
-//            if (permission1 != PackageManager.PERMISSION_GRANTED) {
-//                // We don't have permission so prompt the user
-//                ActivityCompat.requestPermissions(
-//                        activity,
-//                        PERMISSIONS_STORAGE,
-//                        1
-//                );
-//            } else if (permission2 != PackageManager.PERMISSION_GRANTED){
-//                ActivityCompat.requestPermissions(
-//                        activity,
-//                        PERMISSIONS_LOCATION,
-//                        1
-//                );
-//            }
-//            Log.d("TAG2", "CreateConnectThread: " + bluetoothDevice.getUuids());
-//
-//            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-////            0000110a-0000-1000-8000-00805f9b34fb
-////            00001108-0000-1000-8000-00805f9b34fb
-////            00001101-0000-1000-8000-00805f9b34fb
-//
-//            try {
-//                /*
-//                Get a BluetoothSocket to connect with the given BluetoothDevice.
-//                Due to Android device varieties,the method below may not work fo different devices.
-//                You should try using other methods i.e. :
-//                tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
-//                 */
-//                tmp = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
-//
-//
-//            } catch (IOException e) {
-//                Log.e("TAG", "Socket's create() method failed", e);
-//            }
-//            Log.d("Blue", " succ");
-//            mmSocket = tmp;
-//        }
-//        @SuppressLint("MissingPermission")
-//        public void run() {
-//            // Cancel discovery because it otherwise slows down the connection.
-//            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-//            bluetoothAdapter.cancelDiscovery();
-//
-//            try {
-//                // Connect to the remote device through the socket. This call blocks
-//                // until it succeeds or throws an exception.
-//                mmSocket.connect();
-//                Log.e("Status1", "Device connected");
-////                handler.obtainMessage(CONNECTING_STATUS, 1, -1).sendToTarget();
-//            } catch (IOException connectException) {
-//                // Unable to connect; close the socket and return.
-//                try {
-//                    mmSocket.close();
-//                    Log.e("Status", "Cannot connect to device");
-//                    Log.d("TAG", "run: " + connectException);
-////                    handler.obtainMessage(1, -1, -1).sendToTarget();
-//                } catch (IOException closeException) {
-//                    Log.e("TAG", "Could not close the client socket", closeException);
-//                }
-//                return;
-//            }
-//
-//            // The connection attempt succeeded. Perform work associated with
-//            // the connection in a separate thread.
-////            connectedThread = new ConnectedThread(mmSocket);
-////            connectedThread.run();
-//        }
-//
-//        // Closes the client socket and causes the thread to finish.
-//        public void cancel() {
-//            try {
-//                mmSocket.close();
-//            } catch (IOException e) {
-//                Log.e("TAG", "Could not close the client socket", e);
-//            }
-//        }
-//    }
 }
