@@ -46,7 +46,7 @@ public class StopAlarm extends BroadcastReceiver {
                 characteristic.setValue(String.valueOf(x));
                 boolean success = Blueconnection.getInstance().getmGatt().writeCharacteristic(characteristic);
             }
-            Blueconnection.getInstance().getmGatt().disconnect();
+//            Blueconnection.getInstance().getmGatt().disconnect();
         }
 
 //        Blueconnection blueconnection = Blueconnection.getInstance();

@@ -79,6 +79,8 @@ public class HomePageFragment extends Fragment {
 
     private StopAlarm startLight;
 
+    private String time_to_wake ;
+
 
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -99,7 +101,6 @@ public class HomePageFragment extends Fragment {
             Manifest.permission.BLUETOOTH_PRIVILEGED
     };
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -118,10 +119,14 @@ public class HomePageFragment extends Fragment {
         Executor executor = Executors.newSingleThreadExecutor();
         Button setAlarm = view.findViewById(R.id.setAlarmButton);
         Button stopAlarm = view.findViewById(R.id.stopAlarmButton);
+        Button testAlarm = view.findViewById(R.id.testButton);
 
         CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
         CronetEngine cronetEngine = myBuilder.build();
-        TextView time = view.findViewById(R.id.editTextTime);
+        TextView day = view.findViewById(R.id.day);
+        TextView action = view.findViewById(R.id.action);
+        TextView hour = view.findViewById(R.id.hour);
+        TextView date = view.findViewById(R.id.date);
 
         UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
                 "http://" + getString(R.string.ip) + ":5000/get_alarm?" +
@@ -138,13 +143,30 @@ public class HomePageFragment extends Fragment {
             }
         });
 
+        testAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                Date dat = new Date();
+                Calendar cal_alarm = Calendar.getInstance();
+                cal_alarm.setTime(dat);
+                cal_alarm.add(Calendar.SECOND, 3);
+                setAlarm(getActivity(), cal_alarm);
+            }
+        });
+
         setAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Executor executor = Executors.newSingleThreadExecutor();
+                CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
+                CronetEngine cronetEngine = myBuilder.build();
                 UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
-                        "http://" + getString(R.string.ip) + "/set_alarm?" +
+                        "http://" + getString(R.string.ip) + ":5000/set_alarm?" +
                                 "email=" + s1 +
-                                "&wake_time=" + time.getText().toString(),
+                                "&day=" + day.getText().toString() +
+                                "&action=" + action.getText().toString() +
+                                "&hour=" + hour.getText().toString() +
+                                "&date=" + date.getText().toString(),
                         new MyUrlRequestCallback(), executor);
 
                 UrlRequest request = requestBuilder.build();
@@ -510,7 +532,7 @@ public class HomePageFragment extends Fragment {
     public void setAlarm(Context context, Calendar cal_alarm) {
         Intent intent = new Intent(getContext(), PlayMusic.class);
         intent.setAction("start");
-        intent.putExtra("time", "10000"); // ToDo get time of wake
+        intent.putExtra("time", time_to_wake);
         PendingIntent pendingIntent = null;
         boolean bool = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -526,8 +548,9 @@ public class HomePageFragment extends Fragment {
         }
         if (bool) {
             AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
-                    + (3 * 1000), pendingIntent);
+//            alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
+//                    + (3 * 1000), pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, cal_alarm.getTimeInMillis(), pendingIntent);
         }
 
 
@@ -547,25 +570,25 @@ public class HomePageFragment extends Fragment {
 //                + (30 * 1000), pendingIntent2);
     }
 
-    public void setLight(Context context) {
-        Intent intent = new Intent(getContext(), StopAlarm.class);
-        Log.d("TAG", "setLight: here " );
-        intent.setAction("start");
-        intent.putExtra("time", "10000"); // ToDo get time of wake
-        PendingIntent pendingIntent = null;
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            pendingIntent = PendingIntent.getBroadcast(
-                    getContext().getApplicationContext(), 234324243, intent, FLAG_MUTABLE);
-        } else {
-            pendingIntent = PendingIntent.getBroadcast(
-                    getContext().getApplicationContext(), 234324243, intent, PendingIntent.FLAG_ONE_SHOT);
-        }
-        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
-                + (2 * 1000), pendingIntent);
-
-    }
+//    public void setLight(Context context) {
+//        Intent intent = new Intent(getContext(), StopAlarm.class);
+//        Log.d("TAG", "setLight: here " );
+//        intent.setAction("start");
+//        intent.putExtra("time", "10000"); // ToDo get time of wake
+//        PendingIntent pendingIntent = null;
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//            pendingIntent = PendingIntent.getBroadcast(
+//                    getContext().getApplicationContext(), 234324243, intent, FLAG_MUTABLE);
+//        } else {
+//            pendingIntent = PendingIntent.getBroadcast(
+//                    getContext().getApplicationContext(), 234324243, intent, PendingIntent.FLAG_ONE_SHOT);
+//        }
+//        AlarmManager alarmManager = (AlarmManager) getContext().getSystemService(ALARM_SERVICE);
+//        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()
+//                + (2 * 1000), pendingIntent);
+//
+//    }
 
     public class MyUrlRequestCallback extends UrlRequest.Callback {
         private static final String TAG = "MyUrlRequestCallback";
@@ -604,6 +627,7 @@ public class HomePageFragment extends Fragment {
                 alarmText.setText("Your timer was set to be at " +
                         tmp.split("[.]")[0]);
                 int time_too_wake = Integer.parseInt(tmp.split("[.]")[1]);
+                time_to_wake = String.valueOf(time_too_wake*1000);
                 Log.d(TAG, "onReadCompleted: " + time_too_wake);
                 int hour = Integer.parseInt(tmp.split("[.]")[0].split("[:]")[0]);
                 int minute = Integer.parseInt(tmp.split("[.]")[0].split("[:]")[1]);
@@ -611,9 +635,17 @@ public class HomePageFragment extends Fragment {
                 Date dat = new Date();
                 cal_alarm = Calendar.getInstance();
                 cal_alarm.setTime(dat);
-                if (hour > cal_alarm.get(Calendar.HOUR_OF_DAY)
-                        && minute > cal_alarm.get(Calendar.MINUTE)
-                        && seconds > cal_alarm.get(Calendar.SECOND)) {
+                if (hour < cal_alarm.get(Calendar.HOUR_OF_DAY)) {
+                    cal_alarm.add(Calendar.HOUR_OF_DAY, 24);
+                }
+                if (hour == cal_alarm.get(Calendar.HOUR_OF_DAY)
+                        && minute < cal_alarm.get(Calendar.MINUTE)) {
+                    cal_alarm.add(Calendar.HOUR_OF_DAY, 24);
+                }
+
+                if (hour == cal_alarm.get(Calendar.HOUR_OF_DAY)
+                        && minute == cal_alarm.get(Calendar.MINUTE)
+                        && seconds < cal_alarm.get(Calendar.SECOND)) {
                     cal_alarm.add(Calendar.HOUR_OF_DAY, 24);
                 }
                 cal_alarm.add(Calendar.SECOND, -time_too_wake);
@@ -624,6 +656,9 @@ public class HomePageFragment extends Fragment {
                     setAlarm(getActivity(), cal_alarm);
                 }
 
+            }
+            if (res.contains("not")) {
+                alarmText.setText("The alarm was set off ");
             }
             if (res.contains("ok")) {
                 Intent intent = new Intent(getContext(), HomePageActivity.class);
@@ -646,145 +681,4 @@ public class HomePageFragment extends Fragment {
 
 
 
-//    private final BroadcastReceiver receiver = new BroadcastReceiver() {
-//        public void onReceive(Context context, Intent intent) {
-//            Log.d("TAG", "onReceive: ");
-//            String action = intent.getAction();
-//            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-//                // Discovery has found a device. Get the BluetoothDevice
-//                // object and its info from the Intent.
-//                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-//                int permission1 = ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//                int permission2 = ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN);
-//                if (permission1 != PackageManager.PERMISSION_GRANTED) {
-//                    // We don't have permission so prompt the user
-//                    ActivityCompat.requestPermissions(
-//                            getActivity(),
-//                            PERMISSIONS_STORAGE,
-//                            1
-//                    );
-//                } else if (permission2 != PackageManager.PERMISSION_GRANTED){
-//                    ActivityCompat.requestPermissions(
-//                            getActivity(),
-//                            PERMISSIONS_LOCATION,
-//                            1
-//                    );
-//                }
-//                String deviceName = device.getName();
-//                String deviceHardwareAddress = device.getAddress(); // MAC address
-//                Log.d("TAG", "onReceive: " + deviceName);
-//                Log.d("TAG", "onReceive: " + deviceHardwareAddress);
-//                Log.d("TAG", "onReceive: " + device.getUuids());
-////
-//                if(deviceName != null && deviceName.equals("MLT-BT05")) {
-////                    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-////                    CreateConnectThread createConnectThread = new CreateConnectThread(bluetoothAdapter,
-////                            deviceHardwareAddress, getContext(), getActivity());
-////                    createConnectThread.start();
-////                    getContext().unregisterReceiver(this);
-//
-//                    Log.d("TAG", "onReceive: here start");
-//                    BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-//                    createConnectThread = new CreateConnectThread(bluetoothAdapter, deviceHardwareAddress, getContext(), getActivity());
-//                    createConnectThread.start();
-//                }
-//            }
-//        }
-//    };
-
-//    public static class CreateConnectThread extends Thread {
-//
-//        public CreateConnectThread(BluetoothAdapter bluetoothAdapter, String address, Context context, Activity activity) {
-//            /*
-//            Use a temporary object that is later assigned to mmSocket
-//            because mmSocket is final.
-//             */
-//            BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(address);
-//
-//            BluetoothSocket tmp = null;
-//
-//            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-//                Log.d("TAG", "CreateConnectThread: no blue");
-////                return;
-//            }
-//            Log.d("Blue", " succ");
-//            int permission1 = ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//            int permission2 = ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN);
-//            if (permission1 != PackageManager.PERMISSION_GRANTED) {
-//                // We don't have permission so prompt the user
-//                ActivityCompat.requestPermissions(
-//                        activity,
-//                        PERMISSIONS_STORAGE,
-//                        1
-//                );
-//            } else if (permission2 != PackageManager.PERMISSION_GRANTED){
-//                ActivityCompat.requestPermissions(
-//                        activity,
-//                        PERMISSIONS_LOCATION,
-//                        1
-//                );
-//            }
-//            Log.d("TAG2", "CreateConnectThread: " + bluetoothDevice.getUuids());
-//
-//            UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-////            0000110a-0000-1000-8000-00805f9b34fb
-////            00001108-0000-1000-8000-00805f9b34fb
-////            00001101-0000-1000-8000-00805f9b34fb
-//
-//            try {
-//                /*
-//                Get a BluetoothSocket to connect with the given BluetoothDevice.
-//                Due to Android device varieties,the method below may not work fo different devices.
-//                You should try using other methods i.e. :
-//                tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
-//                 */
-//                tmp = bluetoothDevice.createInsecureRfcommSocketToServiceRecord(uuid);
-//
-//
-//            } catch (IOException e) {
-//                Log.e("TAG", "Socket's create() method failed", e);
-//            }
-//            Log.d("Blue", " succ");
-//            mmSocket = tmp;
-//        }
-//        @SuppressLint("MissingPermission")
-//        public void run() {
-//            // Cancel discovery because it otherwise slows down the connection.
-//            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-//            bluetoothAdapter.cancelDiscovery();
-//
-//            try {
-//                // Connect to the remote device through the socket. This call blocks
-//                // until it succeeds or throws an exception.
-//                mmSocket.connect();
-//                Log.e("Status1", "Device connected");
-////                handler.obtainMessage(CONNECTING_STATUS, 1, -1).sendToTarget();
-//            } catch (IOException connectException) {
-//                // Unable to connect; close the socket and return.
-//                try {
-//                    mmSocket.close();
-//                    Log.e("Status", "Cannot connect to device");
-//                    Log.d("TAG", "run: " + connectException);
-////                    handler.obtainMessage(1, -1, -1).sendToTarget();
-//                } catch (IOException closeException) {
-//                    Log.e("TAG", "Could not close the client socket", closeException);
-//                }
-//                return;
-//            }
-//
-//            // The connection attempt succeeded. Perform work associated with
-//            // the connection in a separate thread.
-////            connectedThread = new ConnectedThread(mmSocket);
-////            connectedThread.run();
-//        }
-//
-//        // Closes the client socket and causes the thread to finish.
-//        public void cancel() {
-//            try {
-//                mmSocket.close();
-//            } catch (IOException e) {
-//                Log.e("TAG", "Could not close the client socket", e);
-//            }
-//        }
-//    }
 }
