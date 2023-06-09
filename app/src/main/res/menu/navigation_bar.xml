@@ -8,4 +8,8 @@
         android:id="@+id/homePage"
         android:icon="@drawable/sun_pic"
         android:title="register" />
+    <item
+        android:id="@+id/alarm_view"
+        android:icon="@drawable/sun_pic"
+        android:title="Alarm view" />
 </menu>

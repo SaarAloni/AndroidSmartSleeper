@@ -17,5 +17,5 @@
 
     <string name="msg_conn_not_available">msg_conn_not_available</string>
     <string name="ok">ok</string>
-    <string name="ip">192.168.1.16</string>
+    <string name="ip">192.168.1.206</string>
 </resources>

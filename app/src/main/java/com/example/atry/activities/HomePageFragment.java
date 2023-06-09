@@ -116,17 +116,20 @@ public class HomePageFragment extends Fragment {
         welcomeTextView.setText("Welcome " + s1);
 
 
-        Executor executor = Executors.newSingleThreadExecutor();
+
         Button setAlarm = view.findViewById(R.id.setAlarmButton);
         Button stopAlarm = view.findViewById(R.id.stopAlarmButton);
         Button testAlarm = view.findViewById(R.id.testButton);
 
-        CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
-        CronetEngine cronetEngine = myBuilder.build();
+
         TextView day = view.findViewById(R.id.day);
         TextView action = view.findViewById(R.id.action);
         TextView hour = view.findViewById(R.id.hour);
         TextView date = view.findViewById(R.id.date);
+
+        Executor executor = Executors.newSingleThreadExecutor();
+        CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
+        CronetEngine cronetEngine = myBuilder.build();
 
         UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
                 "http://" + getString(R.string.ip) + ":5000/get_alarm?" +
