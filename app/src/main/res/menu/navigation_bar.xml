@@ -10,6 +10,10 @@
         android:title="register" />
     <item
         android:id="@+id/alarm_view"
-        android:icon="@drawable/sun_pic"
+        android:icon="@drawable/person_pic"
         android:title="Alarm view" />
+    <item
+        android:id="@+id/sleep_view"
+        android:icon="@drawable/night_pic"
+        android:title="Sleep view" />
 </menu>

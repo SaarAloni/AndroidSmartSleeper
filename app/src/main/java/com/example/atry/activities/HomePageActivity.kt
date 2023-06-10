@@ -174,7 +174,6 @@ class HomePageActivity : AppCompatActivity() {
                     }
 
 
-
         }
         binding!!.bottomNavigationView.setOnItemSelectedListener { item: MenuItem ->
             Log.d("TAG2", "This is a debug log message.")
@@ -182,6 +181,7 @@ class HomePageActivity : AppCompatActivity() {
                 R.id.settings_nav -> replaceFragment(SettingsFragment())
                 R.id.homePage -> replaceFragment(HomePageFragment())
                 R.id.alarm_view -> replaceFragment(AlarmRecycleViewFragment())
+                R.id.sleep_view -> replaceFragment(SleepRecycleViewFragment())
             }
             true
         }
