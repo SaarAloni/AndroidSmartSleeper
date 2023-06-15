@@ -22,12 +22,14 @@ import android.bluetooth.le.ScanSettings;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -59,7 +61,14 @@ public class PlayMusic extends BroadcastReceiver {
 //                    rateIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //                    intent.putExtra("rise", "rise");
 //                    context.startActivity(rateIntent);
-            MediaPlayer mPlayer = MediaPlayer.create(context, R.raw.music);
+            SharedPreferences sh = context.getSharedPreferences("MySharedPref", Context.MODE_PRIVATE);
+
+            int resID = context.getResources().getIdentifier(sh.getString("music", "music"),
+                    "raw", context.getPackageName());
+            Log.d("TAG111", "onReceive: " + resID);
+
+            String music = sh.getString("music","music");
+            MediaPlayer mPlayer = MediaPlayer.create(context, resID);
             mPlayer.start();
             blueconnection.setPlayer(mPlayer);
             AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
@@ -75,7 +84,11 @@ public class PlayMusic extends BroadcastReceiver {
                 @Override
                 public void run() {
                     for (int i = 1; i <= 9; i++) {
+                        if(!blueconnection.getPlayer().isPlaying()) {
+                            break;
+                        }
                         final int j = i;
+                        Log.d("TAG", "run: here" );
                         try {
                             if (j == 9) {
                                 Thread.sleep(2000);
@@ -123,11 +136,12 @@ public class PlayMusic extends BroadcastReceiver {
 ////                                            mPlayer.stop();
 ////                                            blueconnection.getPlayer().stop();
 //                                        }
-                                        //Toast.makeText(context, String.valueOf(currentProgressCount), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(context, String.valueOf(currentProgressCount), Toast.LENGTH_SHORT).show();
+                                if(blueconnection.getPlayer().isPlaying()) {
                                         audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);
                                         for (BluetoothGattService service : services) {
                                             BluetoothGattCharacteristic characteristic = service.getCharacteristics().get(0);
-                                            byte x = (byte) (j+1);
+                                            byte x = (byte) (j + 1);
                                             characteristic.setValue(String.valueOf(x));
                                             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                                                 // TODO: Consider calling
@@ -141,6 +155,7 @@ public class PlayMusic extends BroadcastReceiver {
                                             }
                                             boolean success = mGatt.writeCharacteristic(characteristic);
                                         }
+                                    }
                                     }
                                 });
                             }

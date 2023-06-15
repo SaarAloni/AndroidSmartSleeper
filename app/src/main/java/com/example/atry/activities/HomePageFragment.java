@@ -628,7 +628,7 @@ public class HomePageFragment extends Fragment {
             if (res.contains(":")) {
 
                 alarmText.setText("Your timer was set to be at " +
-                        tmp.split("[.]")[0]);
+                        tmp.split("[.]")[0] + ". Recommended time to go to sleep by the AI " + tmp.split("[.]")[2]);
                 int time_too_wake = Integer.parseInt(tmp.split("[.]")[1]);
                 time_to_wake = String.valueOf(time_too_wake*1000);
                 Log.d(TAG, "onReadCompleted: " + time_too_wake);
