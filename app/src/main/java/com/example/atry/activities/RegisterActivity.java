@@ -4,11 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import com.example.atry.R;
 
@@ -29,19 +32,17 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         Button register = findViewById(R.id.register);
-        EditText password = findViewById(R.id.editTextTextPassword);
         EditText email = findViewById(R.id.editTextTextEmail);
         EditText birthday = findViewById(R.id.editTextBithday);
-        EditText gender = findViewById(R.id.editTextGender);
+        RadioButton male = findViewById(R.id.male);
+        RadioButton female = findViewById(R.id.female);
         EditText height = findViewById(R.id.editTextNumberHeight);
         EditText weight = findViewById(R.id.editTextNumberWeight);
+        SharedPreferences sharedPreferences = getSharedPreferences("MySharedPref", MODE_PRIVATE);
+        String s1 = sharedPreferences.getString("email", "");
+        email.setText(s1);
 
-        final String transform_gender;
-        if (gender.getText().equals("female")) {
-            transform_gender = "0";
-        } else {
-            transform_gender = "1";
-        }
+
 
         CronetEngine.Builder myBuilder = new CronetEngine.Builder(this);
         CronetEngine cronetEngine = myBuilder.build();
@@ -49,6 +50,12 @@ public class RegisterActivity extends AppCompatActivity {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                final String transform_gender;
+                if (male.isChecked()) {
+                    transform_gender = "1";
+                } else {
+                    transform_gender = "0";
+                }
                 UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
                         "http://"+getString(R.string.ip)+":5000/register?" +
                                 "email=" +  email.getText() +
@@ -56,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 "&gender=" + transform_gender +
                                 "&height=" + height.getText() +
                                 "&weight=" + weight.getText() +
-                                "&password=" + password.getText(),
+                                "&password=" + "111",
                         new MyUrlRequestCallback(), executor);
 
                 UrlRequest request = requestBuilder.build();
@@ -94,7 +101,8 @@ public class RegisterActivity extends AppCompatActivity {
             byteBuffer.clear();
             request.read(byteBuffer);
             if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("ok")){
-
+                Intent intent = new Intent(context, HomePageActivity.class);
+                startActivity(intent);
             }
 
         }

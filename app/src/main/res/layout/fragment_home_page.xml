@@ -35,8 +35,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/day"
+        app:layout_constraintTop_toBottomOf="@+id/spinner1"
         app:layout_constraintVertical_bias="0.075" />
+
+    <Spinner
+        android:id="@+id/spinner1"
+        android:layout_width="@dimen/_150sdp"
+        android:layout_height="wrap_content"
+        android:background="@android:drawable/btn_dropdown"
+        android:spinnerMode="dropdown"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/alarmText"
+        tools:ignore="MissingConstraints" />
 
     <EditText
         android:id="@+id/hour"
@@ -129,19 +140,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/day"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="day"
-        android:inputType="text"
-        app:layout_constraintBottom_toTopOf="@+id/setAlarmButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewWelcome"
-        app:layout_constraintVertical_bias="0.314" />
 
     <TextView
         android:id="@+id/alarmText"
@@ -149,7 +147,7 @@
         android:layout_height="65dp"
         android:gravity="center"
         android:text="Please set alarm"
-        app:layout_constraintBottom_toTopOf="@+id/day"
+        app:layout_constraintBottom_toTopOf="@+id/spinner1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewWelcome"

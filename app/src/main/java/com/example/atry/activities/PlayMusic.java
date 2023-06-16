@@ -78,6 +78,7 @@ public class PlayMusic extends BroadcastReceiver {
 //                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
             String value = intent.getStringExtra("time");
             int v = Integer.parseInt(value);
+            Log.d("TAG", "onReceive: " + v);
             Handler mHandler = new Handler();
 
             new Thread(new Runnable() {
