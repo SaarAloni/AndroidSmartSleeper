@@ -182,6 +182,7 @@ class HomePageActivity : AppCompatActivity() {
                 R.id.homePage -> replaceFragment(HomePageFragment())
                 R.id.alarm_view -> replaceFragment(AlarmRecycleViewFragment())
                 R.id.sleep_view -> replaceFragment(SleepRecycleViewFragment())
+                R.id.wake_time -> replaceFragment(GetWakeUpTime())
             }
             true
         }
