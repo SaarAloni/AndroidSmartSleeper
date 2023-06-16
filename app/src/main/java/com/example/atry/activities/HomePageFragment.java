@@ -116,17 +116,21 @@ public class HomePageFragment extends Fragment {
         welcomeTextView.setText("Welcome " + s1);
 
 
-        Executor executor = Executors.newSingleThreadExecutor();
+
         Button setAlarm = view.findViewById(R.id.setAlarmButton);
         Button stopAlarm = view.findViewById(R.id.stopAlarmButton);
         Button testAlarm = view.findViewById(R.id.testButton);
+        Button snoozAlarm = view.findViewById(R.id.snoozAlarm);
 
-        CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
-        CronetEngine cronetEngine = myBuilder.build();
+
         TextView day = view.findViewById(R.id.day);
         TextView action = view.findViewById(R.id.action);
         TextView hour = view.findViewById(R.id.hour);
         TextView date = view.findViewById(R.id.date);
+
+        Executor executor = Executors.newSingleThreadExecutor();
+        CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
+        CronetEngine cronetEngine = myBuilder.build();
 
         UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
                 "http://" + getString(R.string.ip) + ":5000/get_alarm?" +
@@ -143,6 +147,20 @@ public class HomePageFragment extends Fragment {
             }
         });
 
+
+        snoozAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                stopAlarm(getContext());
+                Date dat = new Date();
+                Calendar cal_alarm = Calendar.getInstance();
+                cal_alarm.setTime(dat);
+                cal_alarm.add(Calendar.SECOND, 300);
+                time_to_wake = String.valueOf(16000);
+                setAlarm(getActivity(), cal_alarm);
+            }
+        });
+
         testAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view){
@@ -150,6 +168,7 @@ public class HomePageFragment extends Fragment {
                 Calendar cal_alarm = Calendar.getInstance();
                 cal_alarm.setTime(dat);
                 cal_alarm.add(Calendar.SECOND, 3);
+                time_to_wake = String.valueOf(16000);
                 setAlarm(getActivity(), cal_alarm);
             }
         });
@@ -625,7 +644,7 @@ public class HomePageFragment extends Fragment {
             if (res.contains(":")) {
 
                 alarmText.setText("Your timer was set to be at " +
-                        tmp.split("[.]")[0]);
+                        tmp.split("[.]")[0] + ". Recommended time to go to sleep by the AI " + tmp.split("[.]")[2]);
                 int time_too_wake = Integer.parseInt(tmp.split("[.]")[1]);
                 time_to_wake = String.valueOf(time_too_wake*1000);
                 Log.d(TAG, "onReadCompleted: " + time_too_wake);

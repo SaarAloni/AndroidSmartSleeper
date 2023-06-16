@@ -31,6 +31,7 @@
         android:id="@+id/editTextTextMultiLine"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:clickable="false"
         android:ems="10"
         android:gravity="start|top"
         android:inputType="textMultiLine"

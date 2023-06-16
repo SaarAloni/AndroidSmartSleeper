@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.atry.R
@@ -84,13 +83,6 @@ class HomePageActivity : AppCompatActivity() {
             yesterday.add(Calendar.DATE, -1);
             Log.d(TAG, "onCreate: " + System.currentTimeMillis())
 
-            var dat:Date = Date();
-            var cal_alarm:Calendar = Calendar.getInstance();
-            cal_alarm.setTime(dat);
-            cal_alarm.set(Calendar.HOUR_OF_DAY, 22);
-            cal_alarm.set(Calendar.MINUTE, 50);
-            cal_alarm.set(Calendar.SECOND, 0);
-            setAlarm(this, cal_alarm);
 
             val request = SessionReadRequest.Builder()
                     .readSessionsFromAllApps()
@@ -124,6 +116,20 @@ class HomePageActivity : AppCompatActivity() {
                                     MyUrlRequestCallback(this), executor)
                             val request = requestBuilder.build()
                             request.start()
+
+                            val executor2: Executor = Executors.newSingleThreadExecutor()
+                            val myBuilder2: CronetEngine.Builder = CronetEngine.Builder(this)
+                            val cronetEngine2 = myBuilder2.build()
+
+
+                            val requestBuilder2 = cronetEngine2.newUrlRequestBuilder(
+                                "http://" + getString(R.string.ip) + ":5000/get_all_alarms?" +
+                                        "email=" + s1,
+                                MyUrlRequestCallback(this@HomePageActivity), executor2
+                            )
+                            val request2 = requestBuilder2.build()
+                            request2.start()
+
                             object : CountDownTimer(1000, 1000) {
                                 override fun onTick(millisUntilFinished: Long) {}
                                 override fun onFinish() {
@@ -168,13 +174,14 @@ class HomePageActivity : AppCompatActivity() {
                     }
 
 
-
         }
         binding!!.bottomNavigationView.setOnItemSelectedListener { item: MenuItem ->
             Log.d("TAG2", "This is a debug log message.")
             when (item.itemId) {
                 R.id.settings_nav -> replaceFragment(SettingsFragment())
                 R.id.homePage -> replaceFragment(HomePageFragment())
+                R.id.alarm_view -> replaceFragment(AlarmRecycleViewFragment())
+                R.id.sleep_view -> replaceFragment(SleepRecycleViewFragment())
             }
             true
         }
@@ -242,13 +249,28 @@ class HomePageActivity : AppCompatActivity() {
         }
 
         override fun onReadCompleted(request: UrlRequest, info: UrlResponseInfo, byteBuffer: ByteBuffer) {
-            Log.i(TAG, "onReadCompleted method called.")
+
             // You should keep reading the request until there's no more data.
             byteBuffer.clear()
             request.read(byteBuffer)
+            Log.i(TAG, "onReadCompleted method called." + StandardCharsets.UTF_8.decode(byteBuffer).toString())
             if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("need rating")) {
                 val intent = Intent(homePageActivity, SleepRatingActivity::class.java)
                 homePageActivity?.startActivity(intent);
+            }
+            if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("&")) {
+                val sharedPreferences: SharedPreferences? =
+                    homePageActivity?.getSharedPreferences("MySharedPref", MODE_PRIVATE) ?: null
+                val myEdit = sharedPreferences?.edit()
+
+                // write all the data entered by the user in SharedPreference and apply
+
+                // write all the data entered by the user in SharedPreference and apply
+                if (myEdit != null) {
+                    myEdit.putString("data", StandardCharsets.UTF_8.decode(byteBuffer).toString())
+                    myEdit.apply()
+                }
+
             }
         }
 

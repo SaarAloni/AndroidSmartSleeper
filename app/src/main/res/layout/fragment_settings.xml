@@ -62,8 +62,49 @@
                 android:textColor="@color/secondary_text"
                 android:textSize="28sp"
                 android:textStyle="bold"/>
+            <EditText
+                android:id="@+id/birthday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="birthday"
+                android:textColor="@color/secondary_text"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+            <EditText
+                android:id="@+id/gender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="gender"
+                android:textColor="@color/secondary_text"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+            <EditText
+                android:id="@+id/height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="height"
+                android:textColor="@color/secondary_text"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+            <EditText
+                android:id="@+id/weight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="weight"
+                android:textColor="@color/secondary_text"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+
+
+
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/edit"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginTop="20dp"
@@ -120,7 +161,19 @@
                 </RelativeLayout>
             </LinearLayout>
 
-
+            <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <RadioButton android:id="@+id/radio_music1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Music1" />
+                <RadioButton android:id="@+id/radio_music2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Music2" />
+            </RadioGroup>
 
 
 
