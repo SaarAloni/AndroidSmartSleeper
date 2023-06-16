@@ -120,6 +120,7 @@ public class HomePageFragment extends Fragment {
         Button setAlarm = view.findViewById(R.id.setAlarmButton);
         Button stopAlarm = view.findViewById(R.id.stopAlarmButton);
         Button testAlarm = view.findViewById(R.id.testButton);
+        Button snoozAlarm = view.findViewById(R.id.snoozAlarm);
 
 
         TextView day = view.findViewById(R.id.day);
@@ -146,6 +147,20 @@ public class HomePageFragment extends Fragment {
             }
         });
 
+
+        snoozAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                stopAlarm(getContext());
+                Date dat = new Date();
+                Calendar cal_alarm = Calendar.getInstance();
+                cal_alarm.setTime(dat);
+                cal_alarm.add(Calendar.SECOND, 300);
+                time_to_wake = String.valueOf(16000);
+                setAlarm(getActivity(), cal_alarm);
+            }
+        });
+
         testAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view){
@@ -153,6 +168,7 @@ public class HomePageFragment extends Fragment {
                 Calendar cal_alarm = Calendar.getInstance();
                 cal_alarm.setTime(dat);
                 cal_alarm.add(Calendar.SECOND, 3);
+                time_to_wake = String.valueOf(16000);
                 setAlarm(getActivity(), cal_alarm);
             }
         });
