@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -24,6 +25,7 @@ import org.chromium.net.UrlResponseInfo;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -114,7 +116,10 @@ public class SleepRecycleViewFragment extends Fragment {
             Log.d("tag", res);
 
             int pos = 0;
-            for (String result : res.split("&")) {
+            String[] s = res.split("&");
+            String first = s[0];
+            s = Arrays.copyOfRange(s, 1, s.length);
+            for (String result : s) {
                 Log.d("tag", result);
 
                 String[] tmp = result.split(",");
@@ -134,6 +139,16 @@ public class SleepRecycleViewFragment extends Fragment {
                     @Override
                     public void run() {
 
+                        TextView average_hours_of_sleep = getView().findViewById(R.id.average_hours_of_sleep);
+                        TextView average_sleep_quality = getView().findViewById(R.id.average_sleep_quality);
+                        TextView average_hours_of_sleep_last_7 = getView().findViewById(R.id.average_hours_of_sleep_last_7);
+                        TextView average_sleep_quality_last_7 = getView().findViewById(R.id.average_sleep_quality_last_7);
+
+                        String [] tmp = first.split(",");
+                        average_sleep_quality.setText(tmp[0]);
+                        average_hours_of_sleep.setText(tmp[1]);
+                        average_sleep_quality_last_7.setText(tmp[2]);
+                        average_hours_of_sleep_last_7.setText(tmp[3]);
 
                         adapter.notifyItemInserted(0);
 

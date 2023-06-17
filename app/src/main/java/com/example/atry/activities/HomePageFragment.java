@@ -109,6 +109,8 @@ public class HomePageFragment extends Fragment {
         Log.d("TAG", "This is a debug log message.");
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
+        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.BLUETOOTH_SCAN}, 2);
+
 
         welcomeTextView = view.findViewById(R.id.textViewWelcome);
         alarmText = view.findViewById(R.id.alarmText);
@@ -712,7 +714,18 @@ public class HomePageFragment extends Fragment {
 
                     @Override
                     public void run() {
-                        Toast.makeText(getActivity(),"successfully added new alarm ",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(),"Successfully added new alarm ",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+
+            if (res.contains("can't")) {
+                getActivity().runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(),"Can't set this alarm",Toast.LENGTH_SHORT).show();
                     }
                 });
 

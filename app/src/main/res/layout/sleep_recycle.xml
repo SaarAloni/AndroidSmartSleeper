@@ -4,9 +4,127 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/headline"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="60sp"
+            android:layout_height="27sp"
+            android:layout_marginStart="20dp"
+            android:text="average sleep quality"
+            android:textSize="10sp" />
+
+        <TextView
+
+            android:layout_width="65sp"
+            android:layout_height="27sp"
+            android:layout_marginStart="30dp"
+            android:text="average hours of sleep"
+            android:textSize="10sp" />
+
+        <TextView
+            android:layout_width="60sp"
+            android:layout_height="27sp"
+            android:layout_marginStart="30dp"
+            android:text="quality last    7 days"
+            android:textSize="10sp" />
+
+        <TextView
+            android:layout_width="55sp"
+            android:layout_height="27sp"
+            android:layout_marginStart="30dp"
+            android:text="hours last   7 days"
+            android:textSize="10sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/headline"
+        android:id="@+id/headline_sleep"
+        android:padding="10dp">
+
+    <TextView
+        android:id="@+id/average_sleep_quality"
+        android:layout_width="55sp"
+        android:layout_height="27sp"
+        android:layout_marginStart="20dp"
+        android:text="None"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/average_hours_of_sleep"
+        android:layout_width="55sp"
+        android:layout_height="27sp"
+        android:layout_marginStart="30dp"
+        android:text="None"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/average_sleep_quality_last_7"
+        android:layout_width="55sp"
+        android:layout_height="27sp"
+        android:layout_marginStart="35dp"
+        android:text="None"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/average_hours_of_sleep_last_7"
+        android:layout_width="55sp"
+        android:layout_height="27sp"
+        android:layout_marginStart="30dp"
+        android:text="None"
+        android:textSize="20sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/headline_for_results"
+        android:layout_below="@+id/headline_sleep"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="100sp"
+            android:layout_height="27sp"
+            android:layout_marginStart="27dp"
+            android:text="date"
+            android:textSize="25sp" />
+
+        <TextView
+            android:layout_width="100sp"
+            android:layout_height="27sp"
+            android:layout_marginStart="20dp"
+            android:text="start"
+            android:textSize="25sp" />
+
+        <TextView
+            android:layout_width="100sp"
+            android:layout_height="27sp"
+            android:layout_marginStart="20dp"
+            android:text="end"
+            android:textSize="25sp" />
+
+
+
+    </LinearLayout>
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/sleeps"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_below="@id/headline_for_results"/>
 
 </RelativeLayout>
