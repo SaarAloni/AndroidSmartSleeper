@@ -74,11 +74,12 @@ public class SleepRecycleViewFragment extends Fragment {
     }
 
 
-    private List<SleepData> setData(String sleep_date, String start, String end)
+    private List<SleepData> setData(String sleep_date, String start, String end, String quality)
     {
         list.add(new SleepData(sleep_date,
                 start,
-                end));
+                end,
+                quality));
 
 
         return list;
@@ -128,7 +129,8 @@ public class SleepRecycleViewFragment extends Fragment {
                 }
                 list.add(pos,new SleepData(tmp[0],
                         tmp[1],
-                        tmp[2]));
+                        tmp[2],
+                        tmp[3]));
                 pos++;
             }
 

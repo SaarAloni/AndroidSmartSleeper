@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,6 +17,7 @@ public class SleepHolder extends RecyclerView.Adapter<SleepViewHolder> {
 
     List<SleepData> list
             = Collections.emptyList();
+//    private View.OnClickListener onClickListener;
 
     Context context;
 
@@ -59,6 +61,7 @@ public class SleepHolder extends RecyclerView.Adapter<SleepViewHolder> {
         viewHolder.sleep_date.setText(list.get(position).sleep_date);
         viewHolder.start.setText(list.get(position).start);
         viewHolder.end.setText(list.get(position).end);
+        viewHolder.quality.setText(list.get(position).quality);
 //        viewHolder.view.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view)

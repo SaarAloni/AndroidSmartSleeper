@@ -8,24 +8,32 @@
 
     <TextView
         android:id="@+id/sleep_date"
-        android:layout_width="100sp"
-        android:layout_height="27sp"
-        android:layout_marginStart="27dp"
+        android:layout_width="75sp"
+        android:layout_height="25sp"
+        android:layout_marginStart="15dp"
         android:textSize="20sp" />
 
     <TextView
         android:id="@+id/start"
         android:layout_width="100sp"
-        android:layout_height="27sp"
-        android:layout_marginStart="20dp"
+        android:layout_height="25sp"
+        android:layout_marginStart="15dp"
         android:textSize="20sp" />
 
     <TextView
         android:id="@+id/end"
         android:layout_width="100sp"
-        android:layout_height="27sp"
-        android:layout_marginStart="20dp"
+        android:layout_height="25sp"
+        android:layout_marginStart="5dp"
         android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/quality"
+        android:layout_width="25sp"
+        android:layout_height="30sp"
+        android:layout_marginStart="15dp"
+        android:textSize="20sp" />
+
 
 
 

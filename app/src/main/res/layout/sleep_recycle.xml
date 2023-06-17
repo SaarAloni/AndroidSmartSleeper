@@ -87,7 +87,6 @@
     </LinearLayout>
 
     <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -96,24 +95,31 @@
         android:padding="10dp">
 
         <TextView
-            android:layout_width="100sp"
+            android:layout_width="75sp"
             android:layout_height="27sp"
-            android:layout_marginStart="27dp"
+            android:layout_marginStart="15dp"
             android:text="date"
             android:textSize="25sp" />
 
         <TextView
-            android:layout_width="100sp"
+            android:layout_width="75sp"
             android:layout_height="27sp"
             android:layout_marginStart="20dp"
             android:text="start"
             android:textSize="25sp" />
 
         <TextView
-            android:layout_width="100sp"
+            android:layout_width="75sp"
             android:layout_height="27sp"
             android:layout_marginStart="20dp"
             android:text="end"
+            android:textSize="25sp" />
+
+        <TextView
+            android:layout_width="75sp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="quality"
             android:textSize="25sp" />
 
 
