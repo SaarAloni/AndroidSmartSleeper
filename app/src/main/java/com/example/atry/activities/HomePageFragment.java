@@ -109,7 +109,15 @@ public class HomePageFragment extends Fragment {
         Log.d("TAG", "This is a debug log message.");
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
-        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.BLUETOOTH_SCAN}, 2);
+//        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.BLUETOOTH_SCAN}, 2);
+
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_DENIED)
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.BLUETOOTH_CONNECT}, 2);
+            }
+        }
 
 
         welcomeTextView = view.findViewById(R.id.textViewWelcome);
@@ -334,11 +342,11 @@ public class HomePageFragment extends Fragment {
     private ScanCallback mScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
-            Log.i("callbackType", String.valueOf(callbackType));
 
             if(result.getDevice().toString().equals("88:25:83:F0:51:FC")) {
-                Log.i("result", result.toString());
+
                 BluetoothDevice btDevice = result.getDevice();
+                Log.i("result11", btDevice.toString());
                 connectToDevice(btDevice);
             }
 
@@ -373,6 +381,7 @@ public class HomePageFragment extends Fragment {
             };
 
     public void connectToDevice(BluetoothDevice device) {
+
         if (mGatt == null) {
             if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -384,7 +393,9 @@ public class HomePageFragment extends Fragment {
                 // for ActivityCompat#requestPermissions for more details.
                 return;
             }
-            mGatt = device.connectGatt(getContext(), false, gattCallback);
+            Log.d("TAG", "connectToDevice11111111111111111111: ");
+            mGatt = device.connectGatt(getContext(), true, gattCallback);
+            Log.d("TAG", "connectToDevice: " + mGatt.toString());
             scanLeDevice(false);// will stop after first device detection
         }
     }
@@ -657,7 +668,8 @@ public class HomePageFragment extends Fragment {
                         tmp.split("[.]")[0] + ". Recommended time to go to sleep by the AI " + tmp.split("[.]")[2]);
                 int time_too_wake = Integer.parseInt(tmp.split("[.]")[1]);
                 time_to_wake = String.valueOf(time_too_wake*1000);
-                Log.d(TAG, "onReadCompleted: " + time_too_wake);
+                Log.d(TAG, "onReadCompleted1: " + time_too_wake);
+                Log.d(TAG, "onReadCompleted2: " + time_to_wake);
                 int hour = Integer.parseInt(tmp.split("[.]")[0].split("[:]")[0]);
                 int minute = Integer.parseInt(tmp.split("[.]")[0].split("[:]")[1]);
                 int seconds = Integer.parseInt(tmp.split("[.]")[0].split("[:]")[2]);
@@ -667,28 +679,30 @@ public class HomePageFragment extends Fragment {
                 cal_alarm.add(Calendar.SECOND, -time_too_wake);
                 boolean tt = true;
                 if (hour < cal_alarm.get(Calendar.HOUR_OF_DAY)) {
-                   tt = false;
+//                   tt = false;
                     cal_alarm.add(Calendar.HOUR, 24);
                 }
                 if (hour == cal_alarm.get(Calendar.HOUR_OF_DAY)
                         && minute < cal_alarm.get(Calendar.MINUTE)) {
-                    tt = false;
+//                    tt = false;
                     cal_alarm.add(Calendar.HOUR, 24);
                 }
 
                 if (hour == cal_alarm.get(Calendar.HOUR_OF_DAY)
                         && minute == cal_alarm.get(Calendar.MINUTE)
                         && seconds < cal_alarm.get(Calendar.SECOND)) {
-                    tt = false;
+//                    tt = false;
                     cal_alarm.add(Calendar.HOUR, 24);
                 }
                 if (tt) {
                     cal_alarm.set(Calendar.HOUR_OF_DAY, hour);
                     cal_alarm.set(Calendar.MINUTE, minute);
                     cal_alarm.set(Calendar.SECOND, seconds);
+                    cal_alarm.add(Calendar.SECOND, -time_too_wake);
                     if(Blueconnection.getInstance().getmGatt() != null) {
                         setAlarm(getActivity(), cal_alarm);
                     }
+                    Log.d(TAG, "onReadCompleted111: " + cal_alarm.get(Calendar.HOUR) + cal_alarm.get(Calendar.MINUTE) + cal_alarm.get(Calendar.DATE) + time_too_wake);
                 }
 //                else {
 //                    dat = new Date();
