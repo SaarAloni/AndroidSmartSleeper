@@ -38,7 +38,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -107,6 +109,8 @@ public class HomePageFragment extends Fragment {
         Log.d("TAG", "This is a debug log message.");
         View view = inflater.inflate(R.layout.fragment_home_page, container, false);
 
+        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.BLUETOOTH_SCAN}, 2);
+
 
         welcomeTextView = view.findViewById(R.id.textViewWelcome);
         alarmText = view.findViewById(R.id.alarmText);
@@ -123,10 +127,15 @@ public class HomePageFragment extends Fragment {
         Button snoozAlarm = view.findViewById(R.id.snoozAlarm);
 
 
-        TextView day = view.findViewById(R.id.day);
+//        TextView day = view.findViewById(R.id.day);
+        Spinner day = view.findViewById(R.id.spinner1);
         TextView action = view.findViewById(R.id.action);
         TextView hour = view.findViewById(R.id.hour);
         TextView date = view.findViewById(R.id.date);
+
+        String[] items = new String[]{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Date"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, items);
+        day.setAdapter(adapter);
 
         Executor executor = Executors.newSingleThreadExecutor();
         CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
@@ -182,7 +191,7 @@ public class HomePageFragment extends Fragment {
                 UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
                         "http://" + getString(R.string.ip) + ":5000/set_alarm?" +
                                 "email=" + s1 +
-                                "&day=" + day.getText().toString() +
+                                "&day=" + day.getSelectedItem().toString() +
                                 "&action=" + action.getText().toString() +
                                 "&hour=" + hour.getText().toString() +
                                 "&date=" + date.getText().toString(),
@@ -552,6 +561,7 @@ public class HomePageFragment extends Fragment {
         Intent intent = new Intent(getContext(), PlayMusic.class);
         intent.setAction("start");
         intent.putExtra("time", time_to_wake);
+        Log.d("TAG", "setAlarm: " + time_to_wake);
         PendingIntent pendingIntent = null;
         boolean bool = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -654,34 +664,71 @@ public class HomePageFragment extends Fragment {
                 Date dat = new Date();
                 cal_alarm = Calendar.getInstance();
                 cal_alarm.setTime(dat);
+                cal_alarm.add(Calendar.SECOND, -time_too_wake);
+                boolean tt = true;
                 if (hour < cal_alarm.get(Calendar.HOUR_OF_DAY)) {
-                    cal_alarm.add(Calendar.HOUR_OF_DAY, 24);
+                   tt = false;
+                    cal_alarm.add(Calendar.HOUR, 24);
                 }
                 if (hour == cal_alarm.get(Calendar.HOUR_OF_DAY)
                         && minute < cal_alarm.get(Calendar.MINUTE)) {
-                    cal_alarm.add(Calendar.HOUR_OF_DAY, 24);
+                    tt = false;
+                    cal_alarm.add(Calendar.HOUR, 24);
                 }
 
                 if (hour == cal_alarm.get(Calendar.HOUR_OF_DAY)
                         && minute == cal_alarm.get(Calendar.MINUTE)
                         && seconds < cal_alarm.get(Calendar.SECOND)) {
-                    cal_alarm.add(Calendar.HOUR_OF_DAY, 24);
+                    tt = false;
+                    cal_alarm.add(Calendar.HOUR, 24);
                 }
-                cal_alarm.add(Calendar.SECOND, -time_too_wake);
-                cal_alarm.set(Calendar.HOUR_OF_DAY, hour);
-                cal_alarm.set(Calendar.MINUTE, minute);
-                cal_alarm.set(Calendar.SECOND, seconds);
-                if(Blueconnection.getInstance().getmGatt() != null) {
-                    setAlarm(getActivity(), cal_alarm);
+                if (tt) {
+                    cal_alarm.set(Calendar.HOUR_OF_DAY, hour);
+                    cal_alarm.set(Calendar.MINUTE, minute);
+                    cal_alarm.set(Calendar.SECOND, seconds);
+                    if(Blueconnection.getInstance().getmGatt() != null) {
+                        setAlarm(getActivity(), cal_alarm);
+                    }
                 }
+//                else {
+//                    dat = new Date();
+//                    cal_alarm = Calendar.getInstance();
+//                    long current_time = cal_alarm.getTimeInMillis()/1000;
+//                    cal_alarm.setTime(dat);
+//                    cal_alarm.set(Calendar.HOUR_OF_DAY, hour);
+//                    cal_alarm.set(Calendar.MINUTE, minute);
+//                    cal_alarm.set(Calendar.SECOND, seconds);
+//                    long alarm_time = cal_alarm.getTimeInMillis()/1000;
+//                    time_to_wake = String.valueOf( alarm_time - current_time);
+//                    Log.d(TAG, "onReadCompleted: " + time_too_wake);
+//                    setAlarm(getContext(), cal_alarm);
+//                }
+
 
             }
             if (res.contains("not")) {
                 alarmText.setText("The alarm was set off ");
             }
             if (res.contains("ok")) {
-                Intent intent = new Intent(getContext(), HomePageActivity.class);
-                startActivity(intent);
+                getActivity().runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(),"Successfully added new alarm ",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+
+            if (res.contains("can't")) {
+                getActivity().runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(),"Can't set this alarm",Toast.LENGTH_SHORT).show();
+                    }
+                });
+
             }
         }
 

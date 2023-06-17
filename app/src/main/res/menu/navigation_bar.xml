@@ -16,4 +16,9 @@
         android:id="@+id/sleep_view"
         android:icon="@drawable/night_pic"
         android:title="Sleep view" />
+
+    <item
+        android:id="@+id/wake_time"
+        android:icon="@drawable/person_pic"
+        android:title="Wake Up Time" />
 </menu>
