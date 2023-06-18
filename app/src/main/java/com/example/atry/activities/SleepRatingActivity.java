@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
+import android.widget.TextView;
 
 import com.example.atry.R;
 
@@ -51,6 +52,14 @@ public class SleepRatingActivity extends AppCompatActivity {
                 request.start();
             }
         });
+        UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
+                "http://" + getString(R.string.ip) + ":5000/get_last_sleep?" +
+                        "email=" + email,
+                new MyUrlRequestCallback(), executor);
+
+        UrlRequest request = requestBuilder.build();
+        request.start();
+
     }
 
     public class MyUrlRequestCallback extends UrlRequest.Callback {
@@ -79,10 +88,27 @@ public class SleepRatingActivity extends AppCompatActivity {
             // You should keep reading the request until there's no more data.
             byteBuffer.clear();
             request.read(byteBuffer);
-            //Log.i(TAG, StandardCharsets.UTF_8.decode(byteBuffer).toString());
-            if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("ok")){
+            String res = StandardCharsets.UTF_8.decode(byteBuffer).toString();
+            Log.i("TAG", res);
+            if (res.contains("ok")){
                 Intent intent = new Intent(SleepRatingActivity.this, HomePageActivity.class);
                 startActivity(intent);
+            }
+            if (res.contains("&")){
+                String[] s = res.split("&");
+                runOnUiThread(new Runnable() {
+
+                    @Override
+                    public void run() {
+
+                        TextView text = findViewById(R.id.textView);
+                        String[] ss = s[0].split(",");
+                        text.setText("What do you think about the last sleep \n" +
+                                "from: " + ss[0] + "\n" +
+                                "to: " +ss[1]);
+
+                    }
+                });
             }
         }
 

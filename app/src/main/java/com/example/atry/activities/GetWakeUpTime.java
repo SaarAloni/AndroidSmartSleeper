@@ -54,6 +54,8 @@ public class GetWakeUpTime extends Fragment {
         EditText time_to_sleep = getActivity().findViewById(R.id.editTextSleepTime);
         TextView result_text = getActivity().findViewById(R.id.textResultTime);
 
+        Button rate = view.findViewById(R.id.rateButton);
+
         String email = sh.getString("email", "");
 
         wake1.setOnClickListener(new View.OnClickListener() {
@@ -74,6 +76,14 @@ public class GetWakeUpTime extends Fragment {
 
                 UrlRequest request = requestBuilder.build();
                 request.start();
+            }
+        });
+
+        rate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), SleepRatingActivity.class);
+                startActivity(intent);
             }
         });
 

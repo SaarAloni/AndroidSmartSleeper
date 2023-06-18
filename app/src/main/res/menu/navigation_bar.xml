@@ -21,4 +21,11 @@
         android:id="@+id/wake_time"
         android:icon="@drawable/person_pic"
         android:title="Wake Up Time" />
+
+<!--    <item-->
+<!--        android:id="@+id/rate_sleep"-->
+<!--        android:icon="@drawable/night_pic"-->
+<!--        android:title="Rate Sleep" />-->
+
+
 </menu>

@@ -12,6 +12,8 @@ public class SleepViewHolder extends RecyclerView.ViewHolder {
     TextView sleep_date;
     TextView start;
     TextView end;
+
+    TextView quality;
     View view;
 
 
@@ -20,6 +22,7 @@ public class SleepViewHolder extends RecyclerView.ViewHolder {
         sleep_date = (TextView)itemView.findViewById(R.id.sleep_date);
         start = (TextView)itemView.findViewById(R.id.start);
         end = (TextView)itemView.findViewById(R.id.end);
+        quality = (TextView)itemView.findViewById(R.id.quality);
         view  = itemView;
     }
 }
