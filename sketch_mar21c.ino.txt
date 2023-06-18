@@ -1,25 +1,9 @@
 const int led1 = 5;  // light 1
 const int led2 = 6;  // light 2
 
-const int speaker1 = 8;
-
 int state = 0; // input of bluetooth
 
 typedef void(*action) ();
-#include "pitches.h"
-
-
-// notes in the melody:
-int melody[] = {
-
-  NOTE_C4, NOTE_G3, NOTE_G3, NOTE_A3, NOTE_G3, 0, NOTE_B3, NOTE_C4
-};
-
-// note durations: 4 = quarter note, 8 = eighth note, etc.:
-int noteDurations[] = {
-
-  4, 8, 8, 4, 4, 4, 4, 4
-};
 
 void setup() {
   // put your setup code here, to run once:
@@ -42,7 +26,7 @@ void loop() {
       char a = Serial.read();
     }
   }
-  delay(600);
+  delay(200);
   
 }
 
@@ -72,31 +56,31 @@ action changeState(int s) {
 }
 
 void state1() {
-  setLightTo(32);
+  setLightTo(2);
 }
 
 void state2() {
-  setLightTo(64);
+  setLightTo(3);
 }
 
 void state3() {
-  setLightTo(96);
+  setLightTo(8);
 }
 
 void state4() {
-  setLightTo(128);
+  setLightTo(16);
 }
 
 void state5() {
-  setLightTo(160);
+  setLightTo(32);
 }
 
 void state6() {
-  setLightTo(192);
+  setLightTo(96);
 }
 
 void state7() {
-  setLightTo(224);
+  setLightTo(170);
 }
 
 void state8() {
@@ -111,31 +95,4 @@ void setStartLight() {
 void setLightTo(int power) {
   analogWrite(led1, power);
   analogWrite(led2, power);
-}
-
-void playtone() {
-  digitalWrite(led1, 32);
-  for (int thisNote = 0; thisNote < 8; thisNote++) {
-
-    // to calculate the note duration, take one second divided by the note type.
-
-    //e.g. quarter note = 1000 / 4, eighth note = 1000/8, etc.
-
-    int noteDuration = 1000 / noteDurations[thisNote];
-
-    tone(8, melody[thisNote], noteDuration);
-
-    // to distinguish the notes, set a minimum time between them.
-
-    // the note's duration + 30% seems to work well:
-
-    int pauseBetweenNotes = noteDuration * 1.30;
-
-    delay(pauseBetweenNotes);
-
-    // stop the tone playing:
-
-    noTone(8);
-
-  }
 }
