@@ -41,6 +41,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -137,7 +138,7 @@ public class HomePageFragment extends Fragment {
 
 //        TextView day = view.findViewById(R.id.day);
         Spinner day = view.findViewById(R.id.spinner1);
-        TextView action = view.findViewById(R.id.action);
+        Switch action = view.findViewById(R.id.action);
         TextView hour = view.findViewById(R.id.hour);
         TextView date = view.findViewById(R.id.date);
 
@@ -200,7 +201,7 @@ public class HomePageFragment extends Fragment {
                         "http://" + getString(R.string.ip) + ":5000/set_alarm?" +
                                 "email=" + s1 +
                                 "&day=" + day.getSelectedItem().toString() +
-                                "&action=" + action.getText().toString() +
+                                "&action=" + action.isChecked() +
                                 "&hour=" + hour.getText().toString() +
                                 "&date=" + date.getText().toString(),
                         new MyUrlRequestCallback(), executor);
@@ -676,7 +677,7 @@ public class HomePageFragment extends Fragment {
                 Date dat = new Date();
                 cal_alarm = Calendar.getInstance();
                 cal_alarm.setTime(dat);
-                cal_alarm.add(Calendar.SECOND, -time_too_wake);
+//                cal_alarm.add(Calendar.SECOND, -time_too_wake);
                 boolean tt = true;
                 if (hour < cal_alarm.get(Calendar.HOUR_OF_DAY)) {
 //                   tt = false;

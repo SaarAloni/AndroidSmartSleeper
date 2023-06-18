@@ -4,23 +4,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.fragment.app.Fragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioButton;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.atry.R;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import org.chromium.net.CronetEngine;
 import org.chromium.net.CronetException;
@@ -29,65 +25,73 @@ import org.chromium.net.UrlResponseInfo;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-
-public class GetWakeUpTime extends Fragment {
-    private SwitchCompat nightModeSwitch;
-    private boolean nightMode;
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editor;
+public class ratingFragment extends Fragment {
+    private List<SleepData> list = new ArrayList<>();
+    SleepHolder adapter;
+    private View view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d("TAG", "This is a debug log message.");
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragmant_wake_time, container, false);
-
+        View view = inflater.inflate(R.layout.activity_sleep_rating, container, false);
 
         SharedPreferences sh = getActivity().getSharedPreferences("MySharedPref", Context.MODE_PRIVATE);
 
-        Button wake1 = view.findViewById(R.id.getWakeTime);
-        EditText time_to_sleep = getActivity().findViewById(R.id.editTextSleepTime);
-        TextView result_text = getActivity().findViewById(R.id.textResultTime);
+        String s1 = sh.getString("email", "");
 
-        Button rate = view.findViewById(R.id.rateButton);
 
-        String email = sh.getString("email", "");
+        Executor executor = Executors.newSingleThreadExecutor();
+        CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
+        CronetEngine cronetEngine = myBuilder.build();
 
-        wake1.setOnClickListener(new View.OnClickListener() {
+        UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
+                "http://" + getString(R.string.ip) + ":5000/get_last_sleep?" +
+                        "email=" + s1,
+                new MyUrlRequestCallback(), executor);
+
+        UrlRequest request = requestBuilder.build();
+        request.start();
+        RatingBar ratingBar = view.findViewById(R.id.ratingBar);
+        Button rate = view.findViewById(R.id.rate_button);
+
+
+        rate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Executor executor = Executors.newSingleThreadExecutor();
-                CronetEngine.Builder myBuilder = new CronetEngine.Builder(getContext());
-                CronetEngine cronetEngine = myBuilder.build();
-
-                EditText time_to_sleep = getActivity().findViewById(R.id.editTextSleepTime);
-
-
+                MyUrlRequestCallback myUrlRequestCallback = new MyUrlRequestCallback();
                 UrlRequest.Builder requestBuilder = cronetEngine.newUrlRequestBuilder(
-                        "http://" + getString(R.string.ip) + ":5000/get_when_to_wake_up?" +
-                                "email=" + email +
-                                "&sleep_time=" + time_to_sleep.getText(),
-                        new MyUrlRequestCallback(), executor);
+                        "http://"+getString(R.string.ip)+":5000/add_rating?" +
+                                "email=" + s1 +
+                                "&rate=" + ratingBar.getRating(),
+                        myUrlRequestCallback, executor);
 
                 UrlRequest request = requestBuilder.build();
                 request.start();
             }
         });
 
-        rate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), SleepRatingActivity.class);
-                startActivity(intent);
-            }
-        });
+
+
+
 
         return view;
+    }
+
+
+    private List<SleepData> setData(String sleep_date, String start, String end, String quality)
+    {
+        list.add(new SleepData(sleep_date,
+                start,
+                end,
+                quality));
+
+
+        return list;
     }
 
     public class MyUrlRequestCallback extends UrlRequest.Callback {
@@ -120,22 +124,33 @@ public class GetWakeUpTime extends Fragment {
             request.read(byteBuffer);
             String res = StandardCharsets.UTF_8.decode(byteBuffer).toString();
             Log.d("tag", res);
-            String tmp = res.split("[,]", 0)[0];
-            Log.d(TAG, "onReadCompleted: " + tmp);
-            if (res.contains(",")) {
 
+            if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("ok")){
+                Intent intent = new Intent(getContext(), HomePageActivity.class);
+                startActivity(intent);
+            }
+            if (StandardCharsets.UTF_8.decode(byteBuffer).toString().contains("&")){
+                int pos = 0;
+                String[] s = res.split("&");
                 getActivity().runOnUiThread(new Runnable() {
 
                     @Override
                     public void run() {
 
-                        TextView result_time = getView().findViewById(R.id.textResultTime);
-                        result_time.setText(tmp);
+                        TextView text = getView().findViewById(R.id.textView);
+                        String[] ss = s[0].split(",");
+                        text.setText("What do you think about the last sleep \n" +
+                                "from: " + ss[0] + "\n" +
+                                "to: " +ss[1]);
 
                     }
                 });
             }
-        }
+
+
+            }
+
+
 
         @Override
         public void onSucceeded(UrlRequest request, UrlResponseInfo info) {
